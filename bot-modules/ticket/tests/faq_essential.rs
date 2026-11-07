@@ -8,22 +8,21 @@
 use ticket::faq::essential::select;
 use ticket::wiki::PageListItem;
 
-fn page(id: i32, path: &str, title: Option<&str>) -> PageListItem {
+fn page(id: &str, path: &str, title: Option<&str>) -> PageListItem {
     PageListItem {
-        id,
+        id: String::from(id),
         path: String::from(path),
         title: title.map(String::from),
         description: None,
-        is_published: true,
     }
 }
 
 #[test]
 fn both_pages_are_offered_in_a_fixed_order() {
     let listed = [
-        page(1, "troubleshooting", Some("Troubleshooting")),
-        page(2, "faq", Some("FAQ")),
-        page(3, "install", Some("Installing")),
+        page("a1", "troubleshooting", Some("Troubleshooting")),
+        page("a2", "faq", Some("FAQ")),
+        page("a3", "install", Some("Installing")),
     ];
 
     let picked = select(&listed);
@@ -37,7 +36,7 @@ fn both_pages_are_offered_in_a_fixed_order() {
 /// a link to a page that is not there.
 #[test]
 fn a_missing_page_is_simply_absent() {
-    let listed = [page(1, "faq", Some("FAQ"))];
+    let listed = [page("a1", "faq", Some("FAQ"))];
 
     let picked = select(&listed);
 
@@ -47,7 +46,7 @@ fn a_missing_page_is_simply_absent() {
 
 #[test]
 fn a_wiki_with_neither_page_offers_nothing() {
-    let listed = [page(1, "install", Some("Installing"))];
+    let listed = [page("a1", "install", Some("Installing"))];
 
     assert_eq!(select(&listed), []);
 }
@@ -57,9 +56,9 @@ fn a_wiki_with_neither_page_offers_nothing() {
 #[test]
 fn the_shallowest_page_wins() {
     let listed = [
-        page(1, "games/minecraft/faq", Some("Minecraft FAQ")),
-        page(2, "faq", Some("FAQ")),
-        page(3, "games/palworld/faq", Some("Palworld FAQ")),
+        page("a1", "games/minecraft/faq", Some("Minecraft FAQ")),
+        page("a2", "faq", Some("FAQ")),
+        page("a3", "games/palworld/faq", Some("Palworld FAQ")),
     ];
 
     let picked = select(&listed);
@@ -70,7 +69,7 @@ fn the_shallowest_page_wins() {
 
 #[test]
 fn a_page_is_recognised_by_its_title_as_well_as_its_path() {
-    let listed = [page(1, "help/common-questions", Some("FAQ"))];
+    let listed = [page("a1", "help/common-questions", Some("FAQ"))];
 
     let picked = select(&listed);
 
@@ -82,7 +81,7 @@ fn a_page_is_recognised_by_its_title_as_well_as_its_path() {
 /// the author chose freely.
 #[test]
 fn punctuation_and_case_do_not_hide_a_page() {
-    let listed = [page(1, "docs/Trouble-Shooting", None)];
+    let listed = [page("a1", "docs/Trouble-Shooting", None)];
 
     let picked = select(&listed);
 
@@ -93,8 +92,8 @@ fn punctuation_and_case_do_not_hide_a_page() {
 #[test]
 fn a_near_miss_is_not_treated_as_the_page() {
     let listed = [
-        page(1, "faq-archive", Some("Old FAQ")),
-        page(2, "troubleshooting-networking", Some("Network troubleshooting")),
+        page("a1", "faq-archive", Some("Old FAQ")),
+        page("a2", "troubleshooting-networking", Some("Network troubleshooting")),
     ];
 
     assert_eq!(select(&listed), []);
@@ -104,8 +103,8 @@ fn a_near_miss_is_not_treated_as_the_page() {
 #[test]
 fn the_pages_own_title_is_used_when_it_has_one() {
     let listed = [
-        page(1, "faq", Some("Frequently Asked Questions")),
-        page(2, "troubleshooting", None),
+        page("a1", "faq", Some("Frequently Asked Questions")),
+        page("a2", "troubleshooting", None),
     ];
 
     let picked = select(&listed);

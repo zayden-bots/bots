@@ -2,11 +2,11 @@
 pub enum WikiError {
     InvalidUrl(String, url::ParseError),
     UnsupportedScheme(String),
+    MissingHost(String),
     PageNotFound(String),
-    PageForbidden,
-    SourceView(u16),
-    GraphQl { status: u16, message: String },
-    EmptyResponse,
+    NoBody(String),
+    Api { status: u16, message: String },
+    Html(std::io::Error),
     Http(reqwest::Error),
 }
 
@@ -17,19 +17,13 @@ impl std::fmt::Display for WikiError {
             Self::UnsupportedScheme(scheme) => {
                 write!(f, "unsupported wiki url scheme: {scheme}")
             },
+            Self::MissingHost(url) => write!(f, "wiki url {url} has no host"),
             Self::PageNotFound(path) => write!(f, "no wiki page at {path}"),
-            Self::PageForbidden => write!(
-                f,
-                "the wiki API key is not allowed to read page source; grant its \
-                 group `manage:pages` (GraphQL) or `read:source` (source view)"
-            ),
-            Self::SourceView(status) => {
-                write!(f, "wiki source view returned HTTP {status}")
+            Self::NoBody(path) => write!(f, "wiki page {path} returned no content"),
+            Self::Api { status, message } => {
+                write!(f, "wiki api error (HTTP {status}): {message}")
             },
-            Self::GraphQl { status, message } => {
-                write!(f, "wiki graphql error (HTTP {status}): {message}")
-            },
-            Self::EmptyResponse => write!(f, "wiki returned no data and no errors"),
+            Self::Html(e) => write!(f, "could not convert wiki html: {e}"),
             Self::Http(e) => write!(f, "wiki request failed: {e}"),
         }
     }
@@ -39,13 +33,13 @@ impl std::error::Error for WikiError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::InvalidUrl(_, e) => Some(e),
+            Self::Html(e) => Some(e),
             Self::Http(e) => Some(e),
             Self::UnsupportedScheme(_)
+            | Self::MissingHost(_)
             | Self::PageNotFound(_)
-            | Self::PageForbidden
-            | Self::SourceView(_)
-            | Self::GraphQl { .. }
-            | Self::EmptyResponse => None,
+            | Self::NoBody(_)
+            | Self::Api { .. } => None,
         }
     }
 }

@@ -1,9 +1,8 @@
 //! Deriving a wiki's endpoints from the one URL the dashboard collects.
 //!
-//! The dashboard stores the site origin only. Everything else - the GraphQL
-//! endpoint, reader-facing article links, and the source view the module falls
-//! back to when GraphQL refuses page source - is derived here, so a typo in one
-//! field cannot leave the three disagreeing.
+//! The dashboard stores the site origin only. Everything else - the API base
+//! and reader-facing article links - is derived here, so a typo in one field
+//! cannot leave the two disagreeing.
 
 use ticket::wiki::WikiConfig;
 use zayden_app::config::{FaqSettingsRow, SettingsRow};
@@ -52,17 +51,10 @@ fn a_non_http_scheme_is_rejected() {
 fn endpoints_are_derived_from_the_origin() {
     let config = config("https://wiki.example.com").expect("config builds");
 
-    assert_eq!(
-        config.graphql_endpoint().as_str(),
-        "https://wiki.example.com/graphql"
-    );
+    assert_eq!(config.api_base().as_str(), "https://wiki.example.com/_api/");
     assert_eq!(
         config.article_url("Docker").map(|u| u.to_string()).ok().as_deref(),
         Some("https://wiki.example.com/en/Docker")
-    );
-    assert_eq!(
-        config.source_url("Docker").map(|u| u.to_string()).ok().as_deref(),
-        Some("https://wiki.example.com/s/en/Docker")
     );
 }
 
@@ -71,10 +63,7 @@ fn endpoints_are_derived_from_the_origin() {
 fn a_trailing_slash_does_not_double_up() {
     let config = config("https://wiki.example.com/").expect("config builds");
 
-    assert_eq!(
-        config.graphql_endpoint().as_str(),
-        "https://wiki.example.com/graphql"
-    );
+    assert_eq!(config.api_base().as_str(), "https://wiki.example.com/_api/");
 }
 
 #[test]

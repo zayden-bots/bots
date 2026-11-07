@@ -1,44 +1,32 @@
-#![expect(
-    unused_qualifications,
-    reason = "cynic's QueryFragment derive emits fully qualified paths spanned to \
-              the field declarations they were generated from"
-)]
-
-use cynic::{QueryBuilder, QueryFragment, QueryVariables};
 use reqwest::Client;
+use serde::{Deserialize, Deserializer};
 
-use crate::wiki::{WikiConfig, WikiError, graphql, schema};
+use crate::wiki::{WikiConfig, WikiError, client};
 
-#[derive(QueryVariables)]
-struct SearchVariables<'a> {
-    query: &'a str,
-    locale: Option<&'a str>,
-}
-
-#[derive(QueryFragment)]
-#[cynic(graphql_type = "Query", variables = "SearchVariables")]
-struct SearchPages {
-    pages: Option<PageQuery>,
-}
-
-#[derive(QueryFragment)]
-#[cynic(variables = "SearchVariables")]
-struct PageQuery {
-    #[arguments(query: $query, locale: $locale)]
-    search: PageSearchResponse,
-}
-
-#[derive(QueryFragment)]
-struct PageSearchResponse {
-    results: Vec<Option<SearchResult>>,
-}
-
-#[derive(QueryFragment, Debug, Clone)]
-#[cynic(graphql_type = "PageSearchResult")]
+#[derive(Debug, Clone, Deserialize)]
 pub struct SearchResult {
+    pub id: String,
     pub title: String,
+    #[serde(default, deserialize_with = "null_as_empty")]
     pub description: String,
     pub path: String,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SearchResponse {
+    #[serde(default)]
+    pub(crate) results: Vec<SearchResult>,
+    pub(crate) total_hits: Option<usize>,
+}
+
+pub(crate) const PAGE_LIMIT: usize = 100;
+const SEARCH_LIMIT: &str = "50";
+
+fn null_as_empty<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<String, D::Error> {
+    Ok(Option::<String>::deserialize(deserializer)?.unwrap_or_default())
 }
 
 pub async fn search(
@@ -46,12 +34,13 @@ pub async fn search(
     config: &WikiConfig,
     query: &str,
 ) -> Result<Vec<SearchResult>, WikiError> {
-    let operation =
-        SearchPages::build(SearchVariables { query, locale: Some(config.locale()) });
+    let response = client::get::<SearchResponse>(client, config, "pages/search", &[
+        ("query", query),
+        ("locales", config.locale()),
+        ("publishState", "published"),
+        ("limit", SEARCH_LIMIT),
+    ])
+    .await?;
 
-    let data = graphql::run(client, config, &operation).await?;
-
-    Ok(data.pages.map_or_default(|pages| {
-        pages.search.results.into_iter().flatten().collect()
-    }))
+    Ok(response.map_or_default(|response| response.results))
 }

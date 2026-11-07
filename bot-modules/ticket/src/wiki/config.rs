@@ -9,9 +9,8 @@ const DEFAULT_MAX_RESULTS: usize = 5;
 #[derive(Debug, Clone)]
 pub struct WikiConfig {
     site_root: Url,
-    graphql_endpoint: Url,
+    api_base: Url,
     article_base: Url,
-    source_base: Url,
     api_key: Option<String>,
     locale: String,
     max_results: usize,
@@ -47,10 +46,9 @@ impl WikiConfig {
         };
 
         Ok(Some(Self {
-            graphql_endpoint: join("graphql")?,
+            api_base: join("_api/")?,
             site_root: base.clone(),
             article_base: join(&format!("{locale}/"))?,
-            source_base: join(&format!("s/{locale}/"))?,
             api_key: row
                 .wiki_api_key
                 .as_deref()
@@ -64,8 +62,23 @@ impl WikiConfig {
     }
 
     #[must_use]
-    pub fn graphql_endpoint(&self) -> Url {
-        self.graphql_endpoint.clone()
+    pub const fn api_base(&self) -> &Url {
+        &self.api_base
+    }
+
+    pub(crate) fn host(&self) -> Result<&str, WikiError> {
+        self.site_root
+            .host_str()
+            .ok_or_else(|| WikiError::MissingHost(self.site_root.to_string()))
+    }
+
+    #[must_use]
+    pub(crate) fn cache_key(&self) -> String {
+        format!(
+            "{}\n{}",
+            self.site_root,
+            self.api_key.as_deref().unwrap_or_default()
+        )
     }
 
     #[must_use]
@@ -95,8 +108,8 @@ impl WikiConfig {
             .map_err(|e| WikiError::InvalidUrl(path.to_owned(), e))
     }
 
-    pub fn source_url(&self, path: &str) -> Result<Url, WikiError> {
-        self.source_base
+    pub(crate) fn api_url(&self, path: &str) -> Result<Url, WikiError> {
+        self.api_base
             .join(path.trim_start_matches('/'))
             .map_err(|e| WikiError::InvalidUrl(path.to_owned(), e))
     }

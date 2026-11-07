@@ -15,9 +15,9 @@ ai = { workspace = true }
 zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 
-cynic = { workspace = true }
 dashmap = { workspace = true }
 futures = { workspace = true }
+htmd = { workspace = true }
 jiff = { workspace = true, features = ["std"] }
 jiff-cron = { workspace = true }
 jiff-sqlx = { workspace = true }
@@ -35,9 +35,6 @@ url = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["io-util", "macros", "net"] }
-
-[build-dependencies]
-cynic-codegen = { workspace = true }
 
 [[example]]
 name = "import_serversathome_faq"

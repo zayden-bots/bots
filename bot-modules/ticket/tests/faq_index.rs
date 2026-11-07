@@ -5,16 +5,20 @@ use serenity::all::{AutocompleteChoice, AutocompleteValue};
 use ticket::faq::Target;
 use ticket::faq::index::choice::ask;
 
+fn uuid() -> String {
+    String::from("5e71a1ff-ac36-4e51-87f0-69bba3a0151d")
+}
+
 #[test]
 fn a_page_target_round_trips() {
-    let target = Target { id: 42, anchor: None };
+    let target = Target { id: uuid(), anchor: None };
 
     assert_eq!(Target::parse(&target.value()), Some(target));
 }
 
 #[test]
 fn a_heading_target_round_trips() {
-    let target = Target { id: 42, anchor: Some(String::from("backups")) };
+    let target = Target { id: uuid(), anchor: Some(String::from("backups")) };
 
     assert_eq!(Target::parse(&target.value()), Some(target));
 }
@@ -30,7 +34,7 @@ fn a_typed_question_is_not_a_target() {
 
 #[test]
 fn a_value_stays_within_discords_cap() {
-    let target = Target { id: 1234, anchor: Some("section-title-".repeat(20)) };
+    let target = Target { id: uuid(), anchor: Some("section-title-".repeat(20)) };
 
     assert!(target.value().chars().count() <= 100, "{}", target.value());
 }

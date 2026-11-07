@@ -2,7 +2,7 @@ use crate::faq::index::choice::Target;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Entry {
-    pub(crate) id: i32,
+    pub(crate) id: String,
     pub(crate) path: String,
     pub(crate) label: String,
     pub(crate) anchor: Option<String>,
@@ -12,7 +12,7 @@ pub(crate) struct Entry {
 impl Entry {
     #[must_use]
     pub(crate) fn page(
-        id: i32,
+        id: String,
         path: String,
         title: String,
         description: &str,
@@ -29,7 +29,7 @@ impl Entry {
             format!("{title} {} {}", page.label, page.path).to_lowercase();
 
         Self {
-            id: page.id,
+            id: page.id.clone(),
             path: page.path.clone(),
             label,
             anchor: Some(anchor),
@@ -39,7 +39,7 @@ impl Entry {
 
     #[must_use]
     pub(crate) fn target(&self) -> Target {
-        Target { id: self.id, anchor: self.anchor.clone() }
+        Target { id: self.id.clone(), anchor: self.anchor.clone() }
     }
 }
 

@@ -28,7 +28,7 @@ const HEADING_LEVELS: std::ops::RangeInclusive<usize> = 1..=3;
 pub struct WikiIndex {
     guilds: DashMap<GuildId, Arc<Snapshot>>,
     building: DashSet<GuildId>,
-    fetching: DashSet<(GuildId, i32)>,
+    fetching: DashSet<(GuildId, String)>,
     client: Client,
 }
 
@@ -263,7 +263,7 @@ impl WikiIndex {
 
         // Autocomplete fires per keystroke, so without this every character
         // typed would start another fetch of the same page.
-        if !self.fetching.insert((guild_id, page.id)) {
+        if !self.fetching.insert((guild_id, page.id.clone())) {
             return;
         }
 
@@ -274,7 +274,7 @@ impl WikiIndex {
 
         tokio::spawn(async move {
             let found = index.headings(&config, &page).await;
-            index.fetching.remove(&(guild_id, page.id));
+            index.fetching.remove(&(guild_id, page.id.clone()));
 
             if found.is_empty() {
                 return;

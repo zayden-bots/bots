@@ -8,7 +8,7 @@ const SENTINEL: &str = "faq://page/";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Target {
-    pub id: i32,
+    pub id: String,
     pub anchor: Option<String>,
 }
 
@@ -32,7 +32,11 @@ impl Target {
             None => (rest, None),
         };
 
-        Some(Self { id: id.parse().ok()?, anchor })
+        if id.is_empty() || !id.chars().all(|c| c.is_ascii_hexdigit() || c == '-') {
+            return None;
+        }
+
+        Some(Self { id: id.to_owned(), anchor })
     }
 }
 

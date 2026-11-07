@@ -60,10 +60,10 @@ async fn selected(
     context: &FaqContext,
     target: &Target,
 ) -> CreateComponent<'static> {
-    let page = match wiki::page_by_id(&app.http, &context.wiki, target.id).await {
+    let page = match wiki::page_by_id(&app.http, &context.wiki, &target.id).await {
         Ok(page) => page,
         Err(e) => {
-            warn!(error = ?e, id = target.id, "selected wiki page could not be read");
+            warn!(error = ?e, id = %target.id, "selected wiki page could not be read");
             return views::results(&context.wiki, &[]);
         },
     };

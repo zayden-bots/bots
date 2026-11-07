@@ -1,51 +1,60 @@
-#![expect(
-    unused_qualifications,
-    reason = "cynic's QueryFragment derive emits fully qualified paths spanned to \
-              the field declarations they were generated from"
-)]
-
-use cynic::{QueryBuilder, QueryFragment, QueryVariables};
 use reqwest::Client;
 
-use crate::wiki::{WikiConfig, WikiError, graphql, schema};
+use crate::wiki::search::{PAGE_LIMIT, SearchResponse};
+use crate::wiki::{WikiConfig, WikiError, client};
 
-#[derive(QueryVariables)]
-struct ListVariables<'a> {
-    locale: Option<&'a str>,
-}
+const MAX_LISTED: usize = 5000;
 
-#[derive(QueryFragment)]
-#[cynic(graphql_type = "Query", variables = "ListVariables")]
-struct ListPages {
-    pages: Option<PageQuery>,
-}
-
-#[derive(QueryFragment)]
-#[cynic(variables = "ListVariables")]
-struct PageQuery {
-    #[arguments(locale: $locale)]
-    list: Vec<PageListItem>,
-}
-
-#[derive(QueryFragment, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct PageListItem {
-    pub id: i32,
+    pub id: String,
     pub path: String,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub is_published: bool,
 }
 
 pub async fn list(
     client: &Client,
     config: &WikiConfig,
 ) -> Result<Vec<PageListItem>, WikiError> {
-    let operation =
-        ListPages::build(ListVariables { locale: Some(config.locale()) });
+    let limit = PAGE_LIMIT.to_string();
+    let mut items = Vec::new();
+    let mut offset = 0;
 
-    let data = graphql::run(client, config, &operation).await?;
+    loop {
+        let Some(response) =
+            client::get::<SearchResponse>(client, config, "pages/search", &[
+                ("locales", config.locale()),
+                ("publishState", "published"),
+                ("limit", &limit),
+                ("offset", &offset.to_string()),
+            ])
+            .await?
+        else {
+            break;
+        };
 
-    Ok(data.pages.map_or_default(|pages| {
-        pages.list.into_iter().filter(|page| page.is_published).collect()
-    }))
+        let batch = response.results.len();
+
+        items.extend(response.results.into_iter().map(|result| {
+            PageListItem {
+                id: result.id,
+                path: result.path,
+                title: Some(result.title).filter(|title| !title.trim().is_empty()),
+                description: Some(result.description)
+                    .filter(|description| !description.trim().is_empty()),
+            }
+        }));
+
+        offset += batch;
+
+        if batch < PAGE_LIMIT
+            || response.total_hits.is_some_and(|total| offset >= total)
+            || offset >= MAX_LISTED
+        {
+            break;
+        }
+    }
+
+    Ok(items)
 }
