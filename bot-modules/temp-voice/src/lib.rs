@@ -1,6 +1,7 @@
 pub mod actions;
 pub mod commands;
 pub mod components;
+mod discord;
 pub mod error;
 pub mod events;
 pub mod guild_manager;
@@ -10,6 +11,7 @@ use std::time::Duration;
 
 pub use commands::VoiceCommand;
 use dashmap::DashMap;
+pub use discord::TempVoiceModule;
 pub use error::{Result, TempVoiceError};
 pub use guild_manager::TempVoiceRow;
 use serenity::all::{

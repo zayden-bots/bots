@@ -11,6 +11,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+async-trait = { workspace = true }
 zayden-core = { workspace = true }
 
 jiff = { workspace = true, features = ["std"] }

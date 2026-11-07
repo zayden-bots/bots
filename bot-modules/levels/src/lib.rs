@@ -1,10 +1,12 @@
 pub mod commands;
 pub mod common;
 pub mod components;
+mod discord;
 pub mod error;
 pub use commands::{Rank, Xp};
 pub use common::levels::LeaderboardScope;
 pub use components::LevelsCustomId;
+pub use discord::{LevelUpReward, LevelsModule};
 pub use error::{LevelsError, Result};
 
 pub mod message_create;

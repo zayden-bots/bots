@@ -1,4 +1,6 @@
 mod command;
+mod discord;
+pub use discord::ReactionRolesModule;
 pub mod emoji;
 pub mod error;
 pub mod manager;

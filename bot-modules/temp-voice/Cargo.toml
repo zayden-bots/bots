@@ -13,7 +13,9 @@ workspace = true
 [dependencies]
 zayden-core = { workspace = true }
 
+async-trait = { workspace = true }
 dashmap = { workspace = true }
+futures = { workspace = true, features = ["async-await"] }
 serenity = { workspace = true }
 sqlx = { workspace = true }
 tokio = { workspace = true }

@@ -13,3 +13,7 @@ pub mod parse;
 pub mod schedule_rules;
 pub mod source;
 pub mod transport;
+
+mod discord;
+
+pub use discord::MarathonModule;

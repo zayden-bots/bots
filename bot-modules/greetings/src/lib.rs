@@ -1,6 +1,8 @@
 pub mod attachment;
 pub mod commands;
 pub mod cooldown;
+mod discord;
+pub use discord::GreetingsModule;
 pub mod error;
 pub mod images;
 pub mod kind;

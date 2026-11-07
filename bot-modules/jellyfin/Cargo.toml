@@ -15,6 +15,7 @@ zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 zayden-graphics = { workspace = true }
 
+async-trait = { workspace = true }
 futures = { workspace = true, features = ["std", "async-await"] }
 image = { workspace = true }
 jiff = { workspace = true }

@@ -1,0 +1,19 @@
+[package]
+name = "moderation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+zayden-core = { workspace = true }
+
+async-trait = { workspace = true }
+jiff = { workspace = true }
+serenity = { workspace = true, features = ["builder"] }
+sqlx = { workspace = true }

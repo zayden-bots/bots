@@ -15,8 +15,11 @@ zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 
 async-openai = { workspace = true, features = ["byot", "chat-completion"] }
+async-trait = { workspace = true }
 reqwest = { workspace = true }
+secrecy = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serenity = { workspace = true, features = ["builder", "gateway"] }
 serde_json = { workspace = true, features = ["std"] }
 tokio = { workspace = true, features = ["time"] }
 tracing = { workspace = true }

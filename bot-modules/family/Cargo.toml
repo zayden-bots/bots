@@ -15,7 +15,8 @@ zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 zayden-graphics = { workspace = true }
 
-futures = { workspace = true }
+async-trait = { workspace = true }
+futures ={ workspace = true }
 jiff = { workspace = true, features = ["std"] }
 moka = { workspace = true, features = ["future"] }
 reqwest = { workspace = true }

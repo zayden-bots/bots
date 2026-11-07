@@ -16,6 +16,7 @@ jellyfin = { workspace = true }
 zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 
+async-trait = { workspace = true }
 futures = { workspace = true, features = ["std", "async-await"] }
 jiff = { workspace = true }
 jiff-cron = { workspace = true }

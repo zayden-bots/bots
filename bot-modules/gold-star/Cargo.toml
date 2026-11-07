@@ -13,6 +13,7 @@ workspace = true
 [dependencies]
 zayden-core = { workspace = true }
 
+async-trait = { workspace = true }
 jiff = { workspace = true }
 jiff-sqlx = { workspace = true }
 serenity = { workspace = true }

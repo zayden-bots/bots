@@ -5,6 +5,7 @@ pub use error::{LlamaD2Error, Result};
 
 mod counter;
 mod counting_fail;
+mod discord;
 mod dungeon_report;
 mod goodmorning;
 mod goof;
@@ -17,6 +18,7 @@ mod status_update;
 
 pub use counter::Counter;
 pub use counting_fail::CountingFail;
+pub use discord::Llamad2Module;
 pub use dungeon_report::DungeonReport;
 pub use goodmorning::{
     GoodMorning,

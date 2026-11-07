@@ -2,6 +2,7 @@
 
 pub mod commands;
 pub mod components;
+mod discord;
 pub mod embeds;
 pub mod error;
 pub mod events;
@@ -16,6 +17,7 @@ pub mod track;
 pub mod voice;
 
 pub use commands::Command;
+pub use discord::MusicModule;
 pub use embeds::{SeekTarget, parse_seek, parse_timestamp};
 pub use error::{MusicError, Result};
 pub use events::{InactivityCheck, TrackEndNotifier};

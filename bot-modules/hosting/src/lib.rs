@@ -2,6 +2,7 @@ pub mod catalog;
 pub mod commands;
 pub mod components;
 pub mod cron;
+mod discord;
 pub mod error;
 pub mod kofi;
 pub mod modal;
@@ -19,6 +20,7 @@ use zayden_app::config::HostingConfig;
 use zayden_app::events::AppEvent;
 
 pub use crate::catalog::Catalog;
+pub use crate::discord::HostingModule;
 pub use crate::error::{HostingError, Result};
 pub use crate::pelican::PelicanApp;
 pub use crate::pricing::Plan;

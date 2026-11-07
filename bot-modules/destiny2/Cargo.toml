@@ -11,16 +11,19 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+async-trait = { workspace = true }
 bungie-api = { workspace = true }
 futures = { workspace = true }
 google-sheets-api = { workspace = true }
 itertools = { workspace = true }
 jiff-cron = { workspace = true }
+secrecy = { workspace = true }
 serenity = { workspace = true }
 sqlx = { workspace = true }
 thiserror = { workspace = true }
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["rt", "sync"] }
 tracing = { workspace = true }
+zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 
 [dev-dependencies]

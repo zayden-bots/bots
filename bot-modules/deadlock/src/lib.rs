@@ -8,6 +8,7 @@ pub mod cron;
 pub mod db;
 pub mod deliver;
 pub mod diff;
+mod discord;
 pub mod embeds;
 pub mod error;
 pub mod gc;
@@ -21,4 +22,5 @@ pub mod squad_deliver;
 pub mod summary;
 
 pub use client::DeadlockApi;
+pub use discord::DeadlockModule;
 pub use error::{DeadlockError, Result};

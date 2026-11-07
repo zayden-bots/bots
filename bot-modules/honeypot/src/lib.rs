@@ -1,4 +1,6 @@
 pub mod commands;
+mod discord;
+pub use discord::HoneypotModule;
 pub mod error;
 pub mod guard;
 pub mod message_create;

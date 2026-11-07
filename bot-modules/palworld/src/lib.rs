@@ -4,6 +4,7 @@ pub mod client;
 pub mod commands;
 pub mod cron;
 pub mod difficulty;
+mod discord;
 pub mod embeds;
 pub mod error;
 pub mod link;
@@ -16,3 +17,5 @@ pub mod source;
 pub mod transport;
 pub mod typechart;
 pub mod upload;
+
+pub use discord::PalworldModule;

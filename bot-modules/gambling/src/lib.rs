@@ -11,11 +11,13 @@ pub mod commands;
 pub mod common;
 pub mod components;
 pub mod ctx_data;
+mod discord;
 pub mod error;
 pub mod events;
 pub mod game_cache;
 pub mod games;
 pub mod goals;
+mod level_reward;
 pub mod models;
 pub mod stamina;
 pub mod utils;
@@ -42,6 +44,7 @@ pub use common::{
     shop,
 };
 pub use ctx_data::GamblingData;
+pub use discord::GamblingModule;
 pub use error::{GamblingError, Result};
 pub use game_cache::GameCache;
 pub use games::{
@@ -54,6 +57,7 @@ pub use games::{
     select_winners,
 };
 pub use goals::GoalHandler;
+pub use level_reward::CoinReward;
 pub use models::{
     AppliedEffect,
     Coins,

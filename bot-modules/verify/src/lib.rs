@@ -1,4 +1,6 @@
+mod discord;
 pub mod error;
+pub use discord::VerifyModule;
 pub use error::{Result, VerifyError};
 use serenity::all::{
     ButtonStyle,

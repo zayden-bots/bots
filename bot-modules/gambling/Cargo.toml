@@ -14,6 +14,7 @@ workspace = true
 zayden-core = { workspace = true }
 levels = { workspace = true }
 
+async-trait = { workspace = true }
 bigdecimal = { workspace = true }
 dashmap = { workspace = true }
 jiff = { workspace = true }

@@ -14,6 +14,7 @@ workspace = true
 zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 
+async-trait = { workspace = true }
 serenity = { workspace = true }
 sqlx = { workspace = true, features = ["migrate"] }
 thiserror = { workspace = true }

@@ -13,6 +13,7 @@ pub use serenity::all::{ChannelId, ForumTagId, GuildId, RoleId, ThreadId, UserId
 pub mod archive;
 mod batch;
 pub mod components;
+mod discord;
 pub mod donation;
 pub mod error;
 pub mod faq;
@@ -30,6 +31,7 @@ pub mod ticket_manager;
 pub mod wiki;
 
 pub use components::TicketComponent;
+pub use discord::TicketModule;
 use error::Result;
 pub use error::TicketError;
 pub use faq::{FaqArticle, NewArticle, WikiIndex};
