@@ -1,15 +1,9 @@
-use std::marker::PhantomData;
+use std::sync::Arc;
 
 use async_trait::async_trait;
-use zayden_core::{
-    EmojiCacheData,
-    GuildMembersCache,
-    Module,
-    OverlapError,
-    RegistryBuilder,
-};
+use zayden_core::{CronResult, Module, OverlapError, RegistryBuilder};
 
-use crate::GamblingData;
+use crate::{GameCache, StaminaCron};
 
 mod blackjack;
 mod coinflip;
@@ -53,57 +47,65 @@ use shop::Shop;
 use tictactoe::TicTacToe;
 use work::Work;
 
-pub struct GamblingModule<D>(PhantomData<fn() -> D>);
+pub struct GamblingModule {
+    cache: Arc<GameCache>,
+}
 
-impl<D> GamblingModule<D> {
+impl GamblingModule {
     #[must_use]
-    pub const fn new() -> Self {
-        Self(PhantomData)
+    pub fn new() -> Self {
+        Self { cache: Arc::new(GameCache::default()) }
     }
 }
 
-impl<D> Default for GamblingModule<D> {
+impl Default for GamblingModule {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[async_trait]
-impl<D> Module for GamblingModule<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl Module for GamblingModule {
     fn id(&self) -> &'static str {
         "gambling"
     }
 
+    fn cron_jobs(&self) -> Vec<CronResult> {
+        vec![
+            StaminaCron::cron_job(),
+            crate::Lotto::cron_job(),
+            crate::HigherLower::cron_job(),
+        ]
+    }
+
     fn register(&self, b: &mut RegistryBuilder) -> Result<(), OverlapError> {
-        b.add_command(Blackjack::<D>(PhantomData))
-            .add_component(Blackjack::<D>(PhantomData))?
-            .add_command(Coinflip::<D>(PhantomData))
-            .add_command(Craft::<D>(PhantomData))
-            .add_command(Daily::<D>(PhantomData))
-            .add_command(Dig::<D>(PhantomData))
-            .add_command(Gift::<D>(PhantomData))
-            .add_command(Goals::<D>(PhantomData))
-            .add_command(HigherLower::<D>(PhantomData))
-            .add_component(HigherLower::<D>(PhantomData))?
-            .add_command(Inventory::<D>(PhantomData))
-            .add_command(Leaderboard::<D>(PhantomData))
-            .add_component(Leaderboard::<D>(PhantomData))?
-            .add_command(Lotto::<D>(PhantomData))
-            .add_command(Mine::<D>(PhantomData))
+        let cache = &self.cache;
+        b.add_command(Blackjack(Arc::clone(cache)))
+            .add_component(Blackjack(Arc::clone(cache)))?
+            .add_command(Coinflip(Arc::clone(cache)))
+            .add_command(Craft)
+            .add_command(Daily)
+            .add_command(Dig)
+            .add_command(Gift)
+            .add_command(Goals)
+            .add_command(HigherLower(Arc::clone(cache)))
+            .add_component(HigherLower(Arc::clone(cache)))?
+            .add_command(Inventory)
+            .add_command(Leaderboard)
+            .add_component(Leaderboard)?
+            .add_command(Lotto)
+            .add_command(Mine)
             .add_command(Prestige)
             .add_component(Prestige)?
-            .add_command(Profile::<D>(PhantomData))
-            .add_command(Roll::<D>(PhantomData))
-            .add_command(RockPaperScissors::<D>(PhantomData))
-            .add_command(SendCmd::<D>(PhantomData))
-            .add_command(Shop::<D>(PhantomData))
-            .add_component(Shop::<D>(PhantomData))?
-            .add_command(TicTacToe::<D>(PhantomData))
-            .add_component(TicTacToe::<D>(PhantomData))?
-            .add_command(Work::<D>(PhantomData));
+            .add_command(Profile)
+            .add_command(Roll(Arc::clone(cache)))
+            .add_command(RockPaperScissors(Arc::clone(cache)))
+            .add_command(SendCmd)
+            .add_command(Shop)
+            .add_component(Shop)?
+            .add_command(TicTacToe(Arc::clone(cache)))
+            .add_component(TicTacToe(Arc::clone(cache)))?
+            .add_command(Work);
 
         Ok(())
     }

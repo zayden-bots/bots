@@ -16,7 +16,7 @@ use serenity::all::{
 use sqlx::PgPool;
 use sqlx::prelude::FromRow;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, as_i64, as_u64};
+use zayden_core::{FormatNum, RuntimeState, as_i64, as_u64};
 
 use super::Commands;
 use crate::events::{Dispatch, Event};
@@ -323,7 +323,7 @@ impl MineAmount for DigRow {
 }
 
 impl Commands {
-    pub async fn dig<Data: EmojiCacheData>(
+    pub async fn dig(
         ctx: &Context,
         interaction: &CommandInteraction,
         pool: &PgPool,
@@ -389,7 +389,7 @@ impl Commands {
         }
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

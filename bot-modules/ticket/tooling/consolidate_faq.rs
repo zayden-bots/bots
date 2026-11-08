@@ -36,7 +36,11 @@ async fn main() -> Result<(), BoxError> {
     let pool = PgPool::connect(&env::var("DATABASE_URL")?).await?;
     let config = BotConfig::load(&pool).await?;
     let reconciler = Reconciler::new(
-        config.ai_provider_key.expose_secret(),
+        config
+            .ai_provider_key
+            .as_ref()
+            .ok_or("AI_PROVIDER_KEY is not set")?
+            .expose_secret(),
         &config.ai_api_endpoint,
         &config.ai_model_structured,
         &config.ai_model_pro,

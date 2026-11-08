@@ -1,12 +1,10 @@
 use std::borrow::Cow;
-use std::marker::PhantomData;
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use serenity::all::CreateCommand;
 use zayden_core::{
     ComponentCtx,
-    EmojiCacheData,
-    GuildMembersCache,
     HandlerError,
     IdMatch,
     InvocationCtx,
@@ -14,15 +12,12 @@ use zayden_core::{
     ModuleComponent,
 };
 
-use crate::{Commands, GamblingData};
+use crate::{Commands, GameCache};
 
-pub(super) struct TicTacToe<D>(pub(super) PhantomData<fn() -> D>);
+pub(super) struct TicTacToe(pub(super) Arc<GameCache>);
 
 #[async_trait]
-impl<D> ModuleCommand for TicTacToe<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleCommand for TicTacToe {
     fn name(&self) -> Cow<'static, str> {
         Cow::Borrowed("tictactoe")
     }
@@ -37,17 +32,14 @@ where
 
     async fn run(&self, cx: &InvocationCtx<'_>) -> Result<(), HandlerError> {
         let options = cx.interaction.data.options();
-        Commands::tictactoe::<D>(cx.ctx, cx.interaction, options, &cx.app.db)
+        Commands::tictactoe(cx.ctx, cx.interaction, options, &cx.app.db, &self.0)
             .await?;
         Ok(())
     }
 }
 
 #[async_trait]
-impl<D> ModuleComponent for TicTacToe<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleComponent for TicTacToe {
     fn module(&self) -> Option<&'static str> {
         Some("gambling")
     }
@@ -57,7 +49,7 @@ where
     }
 
     async fn run(&self, cx: &ComponentCtx<'_>) -> Result<(), HandlerError> {
-        crate::components::TicTacToe::run_component::<D>(
+        crate::components::TicTacToe::run_component(
             cx.ctx,
             cx.interaction,
             &cx.app.db,

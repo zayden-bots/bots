@@ -1,25 +1,15 @@
 use std::borrow::Cow;
-use std::marker::PhantomData;
 
 use async_trait::async_trait;
 use serenity::all::CreateCommand;
-use zayden_core::{
-    EmojiCacheData,
-    GuildMembersCache,
-    HandlerError,
-    InvocationCtx,
-    ModuleCommand,
-};
+use zayden_core::{HandlerError, InvocationCtx, ModuleCommand};
 
-use crate::{Commands, GamblingData};
+use crate::Commands;
 
-pub(super) struct SendCmd<D>(pub(super) PhantomData<fn() -> D>);
+pub(super) struct SendCmd;
 
 #[async_trait]
-impl<D> ModuleCommand for SendCmd<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleCommand for SendCmd {
     fn name(&self) -> Cow<'static, str> {
         Cow::Borrowed("send")
     }
@@ -34,7 +24,7 @@ where
 
     async fn run(&self, cx: &InvocationCtx<'_>) -> Result<(), HandlerError> {
         let options = cx.interaction.data.options();
-        Commands::send::<D>(cx.ctx, cx.interaction, options, &cx.app.db).await?;
+        Commands::send(cx.ctx, cx.interaction, options, &cx.app.db).await?;
         Ok(())
     }
 }

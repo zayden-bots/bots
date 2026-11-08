@@ -19,7 +19,7 @@ use serenity::all::{
     SeparatorSpacingSize,
 };
 use zayden_core::limits::autocomplete::CHOICE_NAME as MAX_CHOICE_NAME;
-use zayden_core::{EmojiCache, EmojiCacheData, EmojiResult};
+use zayden_core::{EmojiCache, EmojiResult, RuntimeState};
 
 use super::domain::{Archetype, ArmourSlot, Class, Element, StatKind};
 use super::markdown::{emoji_section, with_emoji_row};
@@ -94,12 +94,12 @@ impl LoadoutRecord {
             .collect()
     }
 
-    pub async fn into_component<Data: EmojiCacheData>(
+    pub async fn into_component(
         self,
         ctx: &Context,
         parent_token: &str,
     ) -> Result<CreateComponent<'static>> {
-        let data_lock = ctx.data::<tokio::sync::RwLock<Data>>();
+        let data_lock = ctx.data::<tokio::sync::RwLock<RuntimeState>>();
 
         let mut owned_cache = {
             let data = data_lock.read().await;

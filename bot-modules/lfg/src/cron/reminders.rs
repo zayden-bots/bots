@@ -13,11 +13,11 @@ use serenity::all::{
 use sqlx::PgPool;
 use tokio::sync::RwLock;
 use tracing::error;
-use zayden_core::{CronJob, CronJobData};
+use zayden_core::{CronJob, RuntimeState};
 
 use crate::{Join, PostRow};
 
-pub async fn create_reminders<Data: CronJobData>(ctx: &Context, row: &PostRow) {
+pub async fn create_reminders(ctx: &Context, row: &PostRow) {
     let post_id = row.thread();
     let start_time = row.start_time.to_jiff().to_zoned(TimeZone::UTC);
 
@@ -107,7 +107,7 @@ pub async fn create_reminders<Data: CronJobData>(ctx: &Context, row: &PostRow) {
 
     let job_id = format!("lfg_{post_id}");
 
-    let data = ctx.data::<RwLock<Data>>();
+    let data = ctx.data::<RwLock<RuntimeState>>();
     let mut data = data.write().await;
     data.jobs_mut().retain(|job| job.id != job_id);
     data.jobs_mut().extend([week_job, day_job, mins_30_job, now_job]);

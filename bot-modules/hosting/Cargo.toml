@@ -20,6 +20,7 @@ jiff-cron = { workspace = true }
 jiff-sqlx = { workspace = true }
 rand = { workspace = true, features = ["std", "std_rng"] }
 reqwest = { workspace = true, features = ["rustls", "http2", "json", "query"] }
+secrecy = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serenity = { workspace = true }
 sqlx = { workspace = true, features = ["macros", "migrate"] }

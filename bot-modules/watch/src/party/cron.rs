@@ -6,7 +6,7 @@ use jiff::{Span, Timestamp, Zoned};
 use serenity::all::Context;
 use tokio::sync::RwLock;
 use tracing::error;
-use zayden_core::{CronJob, CronJobData};
+use zayden_core::{CronJob, RuntimeState};
 
 use crate::party::lifecycle;
 use crate::party::row::PartyRow;
@@ -29,7 +29,7 @@ fn schedule(at: &Zoned) -> String {
     )
 }
 
-pub async fn create_jobs<Data: CronJobData>(
+pub async fn create_jobs(
     ctx: &Context,
     runtime: &Arc<JellyfinRuntime>,
     party: &PartyRow,
@@ -118,16 +118,16 @@ pub async fn create_jobs<Data: CronJobData>(
         }
     }
 
-    let data = ctx.data::<RwLock<Data>>();
+    let data = ctx.data::<RwLock<RuntimeState>>();
     let mut data = data.write().await;
     data.jobs_mut().retain(|job| job.id != id);
     data.jobs_mut().extend(jobs);
 }
 
-pub async fn clear_jobs<Data: CronJobData>(ctx: &Context, party_id: i64) {
+pub async fn clear_jobs(ctx: &Context, party_id: i64) {
     let id = job_id(party_id);
 
-    let data = ctx.data::<RwLock<Data>>();
+    let data = ctx.data::<RwLock<RuntimeState>>();
     let mut data = data.write().await;
     data.jobs_mut().retain(|job| job.id != id);
 }

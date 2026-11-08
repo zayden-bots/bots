@@ -3,10 +3,22 @@ use std::sync::Arc;
 use reqwest::Client;
 use secrecy::ExposeSecret;
 use zayden_app::config::JellyfinConfig;
+use zayden_core::{ModuleCtx, ModuleError};
 
 use crate::cache::JellyfinCaches;
 use crate::error::Result;
 use crate::transport::{JellyfinClient, PlaybackClient, SeerClient};
+
+pub fn runtime_from_config(
+    cx: &ModuleCtx<'_>,
+) -> std::result::Result<Option<Arc<JellyfinRuntime>>, ModuleError> {
+    cx.config
+        .jellyfin
+        .as_ref()
+        .map(|c| JellyfinRuntime::new(cx.app.http.clone(), c))
+        .transpose()
+        .map_err(|e| ModuleError::init("jellyfin", e))
+}
 
 #[derive(Debug)]
 pub struct JellyfinRuntime {

@@ -18,7 +18,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCache, EmojiCacheData, FormatNum};
+use zayden_core::{EmojiCache, FormatNum, RuntimeState};
 
 use crate::events::{Dispatch, Event, GameEvent};
 use crate::games::blackjack::{
@@ -39,7 +39,6 @@ use crate::utils::effects_summary;
 use crate::{
     Coins,
     EffectsManager,
-    GamblingData,
     GamblingError,
     GamblingManager,
     GameDelta,
@@ -51,13 +50,13 @@ use crate::{
 pub struct Blackjack;
 
 impl Blackjack {
-    pub async fn hit<Data: GamblingData + EmojiCacheData>(
+    pub async fn hit(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
     ) -> Result<()> {
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };
@@ -75,13 +74,13 @@ impl Blackjack {
         continue_round(ctx, interaction, &emojis, &game).await
     }
 
-    pub async fn stand<Data: GamblingData + EmojiCacheData>(
+    pub async fn stand(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
     ) -> Result<()> {
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };
@@ -97,13 +96,13 @@ impl Blackjack {
         Ok(())
     }
 
-    pub async fn double<Data: GamblingData + EmojiCacheData>(
+    pub async fn double(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
     ) -> Result<()> {
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };
@@ -125,13 +124,13 @@ impl Blackjack {
         Ok(())
     }
 
-    pub async fn split<Data: GamblingData + EmojiCacheData>(
+    pub async fn split(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
     ) -> Result<()> {
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };
@@ -156,13 +155,13 @@ impl Blackjack {
         continue_round(ctx, interaction, &emojis, &game).await
     }
 
-    pub async fn surrender<Data: GamblingData + EmojiCacheData>(
+    pub async fn surrender(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
     ) -> Result<()> {
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

@@ -15,8 +15,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::cache::GuildMembersCache;
-use zayden_core::{EmojiCacheData, as_i64, parse_options};
+use zayden_core::{RuntimeState, as_i64, parse_options};
 
 use super::Commands;
 use crate::common::leaderboard::{get_row_number, get_rows};
@@ -24,7 +23,7 @@ use crate::shop::{EGGPLANT, LOTTO_TICKET};
 use crate::{GamblingError, Result};
 
 impl Commands {
-    pub async fn leaderboard<Data: GuildMembersCache + EmojiCacheData>(
+    pub async fn leaderboard(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -48,14 +47,14 @@ impl Commands {
             None
         } else {
             let users = {
-                let data = ctx.data::<RwLock<Data>>();
+                let data = ctx.data::<RwLock<RuntimeState>>();
                 let data = data.read().await;
                 let guild_id = interaction.guild_id.ok_or_else(|| {
                     GamblingError::Internal(
                         "guild_id missing in leaderboard command".to_string(),
                     )
                 })?;
-                data.get()
+                data.guild_members()
                     .get(&guild_id)
                     .ok_or_else(|| {
                         GamblingError::Internal(
@@ -72,7 +71,7 @@ impl Commands {
         let rows = get_rows(leaderboard, pool, users.as_deref(), 1).await?;
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

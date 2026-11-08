@@ -1,7 +1,6 @@
 mod watch;
 
 use std::borrow::Cow;
-use std::marker::PhantomData;
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -19,7 +18,7 @@ use zayden_core::error::HandlerError;
 use zayden_core::module::{ModuleComponent, ModuleModal};
 use zayden_core::scope::IdMatch;
 use zayden_core::{
-    CronJobData,
+    CronResult,
     EventCtx,
     EventKind,
     Module,
@@ -28,6 +27,7 @@ use zayden_core::{
 };
 
 use self::watch::{Watch, apply};
+use crate::JellyfinPartyReaperCron;
 use crate::components::{
     PARTY_CANCEL_PREFIX,
     PARTY_JOIN_PREFIX,
@@ -85,16 +85,12 @@ impl ModuleComponent for PartyLeave {
     }
 }
 
-struct PartyCancel<D> {
+struct PartyCancel {
     runtime: RuntimeHandle,
-    _data: PhantomData<fn() -> D>,
 }
 
 #[async_trait]
-impl<D> ModuleComponent for PartyCancel<D>
-where
-    D: CronJobData + Send + Sync + 'static,
-{
+impl ModuleComponent for PartyCancel {
     fn module(&self) -> Option<&'static str> {
         Some("jellyfin")
     }
@@ -108,7 +104,7 @@ where
         let suffix = suffix(cx, PARTY_CANCEL_PREFIX);
 
         let scheduled = party::cancel(cx, &runtime, &suffix).await?;
-        apply::<D>(cx.ctx, &runtime, scheduled).await;
+        apply(cx.ctx, &runtime, scheduled).await;
 
         Ok(())
     }
@@ -188,45 +184,32 @@ impl ModuleModal for GuessSubmit {
     }
 }
 
-pub struct WatchModule<D> {
+pub struct WatchModule {
     runtime: RuntimeHandle,
-    _data: PhantomData<fn() -> D>,
 }
 
-impl<D> WatchModule<D> {
+impl WatchModule {
     #[must_use]
     pub const fn new(runtime: Option<Arc<JellyfinRuntime>>) -> Self {
-        Self { runtime: RuntimeHandle::new(runtime), _data: PhantomData }
+        Self { runtime: RuntimeHandle::new(runtime) }
     }
 }
 
 #[async_trait]
-impl<D> Module for WatchModule<D>
-where
-    D: CronJobData + Send + Sync + 'static,
-{
+impl Module for WatchModule {
     fn id(&self) -> &'static str {
         "watch"
     }
 
     fn register(&self, b: &mut RegistryBuilder) -> Result<(), OverlapError> {
-        b.add_command(Watch::<D> {
-            runtime: self.runtime.clone(),
-            _data: PhantomData,
-        })
-        .add_autocomplete(Watch::<D> {
-            runtime: self.runtime.clone(),
-            _data: PhantomData,
-        })
-        .add_component(PartyJoin { runtime: self.runtime.clone() })?
-        .add_component(PartyLeave { runtime: self.runtime.clone() })?
-        .add_component(PartyCancel::<D> {
-            runtime: self.runtime.clone(),
-            _data: PhantomData,
-        })?
-        .add_component(TriviaAnswer)?
-        .add_component(GuessOpen)?
-        .add_modal(GuessSubmit)?;
+        b.add_command(Watch { runtime: self.runtime.clone() })
+            .add_autocomplete(Watch { runtime: self.runtime.clone() })
+            .add_component(PartyJoin { runtime: self.runtime.clone() })?
+            .add_component(PartyLeave { runtime: self.runtime.clone() })?
+            .add_component(PartyCancel { runtime: self.runtime.clone() })?
+            .add_component(TriviaAnswer)?
+            .add_component(GuessOpen)?
+            .add_modal(GuessSubmit)?;
 
         Ok(())
     }
@@ -247,10 +230,21 @@ where
         // Party provisioning and cleanup are lost with the in-memory cron jobs,
         // so anything the bot was down for has to be caught up here.
         if let Some(runtime) = self.runtime.as_option() {
-            crate::events::guild_create::<D>(cx.ctx, runtime, &cx.app.db, guild.id)
-                .await;
+            crate::events::guild_create(cx.ctx, runtime, &cx.app.db, guild.id).await;
         }
 
         Ok(())
+    }
+
+    // Guest accounts are real accounts on a real media server, so the
+    // reaper is registered alongside the refresh jobs rather than being
+    // left to the in-memory per-party schedules.
+    fn cron_jobs(&self) -> Vec<CronResult> {
+        self.runtime.as_option().map_or_else(Vec::new, |runtime| {
+            vec![
+                JellyfinPartyReaperCron::cron_job(Arc::clone(runtime)),
+                JellyfinPartyReaperCron::reconcile_job(Arc::clone(runtime)),
+            ]
+        })
     }
 }

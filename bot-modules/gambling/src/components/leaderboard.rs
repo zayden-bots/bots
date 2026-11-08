@@ -8,13 +8,13 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, GuildMembersCache, as_i64};
+use zayden_core::{RuntimeState, as_i64};
 
 use crate::common::leaderboard::{get_row_number, get_rows};
 use crate::{GamblingError, Leaderboard, Result};
 
 impl Leaderboard {
-    pub async fn run_component<Data: GuildMembersCache + EmojiCacheData>(
+    pub async fn run_component(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
@@ -82,14 +82,14 @@ impl Leaderboard {
 
         let users = if global.is_none() {
             let users = {
-                let data = ctx.data::<RwLock<Data>>();
+                let data = ctx.data::<RwLock<RuntimeState>>();
                 let data = data.read().await;
                 let guild_id = interaction.guild_id.ok_or_else(|| {
                     GamblingError::Internal(
                         "guild_id missing in leaderboard component".to_string(),
                     )
                 })?;
-                data.get()
+                data.guild_members()
                     .get(&guild_id)
                     .ok_or_else(|| {
                         GamblingError::Internal(
@@ -134,7 +134,7 @@ impl Leaderboard {
         }
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

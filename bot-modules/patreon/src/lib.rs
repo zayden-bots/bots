@@ -4,7 +4,9 @@ pub mod content;
 pub mod cron;
 pub mod embeds;
 pub mod error;
+mod listener;
 pub mod model;
+mod module;
 pub mod oauth;
 pub mod release;
 pub mod store;
@@ -15,6 +17,7 @@ pub use announce::announce_pending;
 pub use cron::PatreonPollCron;
 pub use error::{PatreonError, Result};
 pub use model::PatreonPost;
+pub use module::{PatreonModule, app_from_config};
 pub use oauth::{PatreonApp, TokenPair};
 pub use release::{forget_campaign, release};
 pub use store::{

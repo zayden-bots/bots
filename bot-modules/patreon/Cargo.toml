@@ -14,8 +14,10 @@ ignored = ["md-5"]
 workspace = true
 
 [dependencies]
+zayden-app = { workspace = true }
 zayden-core = { workspace = true }
 
+async-trait = { workspace = true }
 ego-tree = { workspace = true }
 futures = { workspace = true }
 hmac = { workspace = true }
@@ -25,11 +27,13 @@ jiff-sqlx = { workspace = true }
 md-5 = { workspace = true }
 reqwest = { workspace = true, features = ["rustls", "http2", "json", "query", "form"] }
 scraper = { workspace = true }
+secrecy = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 serenity = { workspace = true, features = ["rustls_backend", "builder", "gateway"] }
 sqlx = { workspace = true }
 thiserror = { workspace = true }
+tokio = { workspace = true, features = ["rt", "sync"] }
 tracing = { workspace = true }
 url = { workspace = true }
 

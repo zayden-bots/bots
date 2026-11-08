@@ -860,8 +860,8 @@ the modules `pub` satisfies both and matches how `zayden-core` is laid out. No
 Only the target's avatar hash is known from the interaction payload. Resolving
 everyone else's would cost a REST call per member — exactly the per-person
 round-trip pattern this change exists to remove. Non-target nodes fall back to
-Discord's default avatar. Revisit only if `GuildMembersCache` can supply hashes
-for free.
+Discord's default avatar. Revisit only if the `RuntimeState` guild-member
+cache can supply hashes for free.
 
 ### 7. `Renderer::with_fonts` exists for tests
 

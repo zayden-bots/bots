@@ -14,7 +14,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, parse_options};
+use zayden_core::{RuntimeState, parse_options};
 
 use super::Commands;
 use crate::components::HigherLowerCustomId;
@@ -23,8 +23,8 @@ use crate::{
     CARD_DECK,
     Coins,
     EffectsManager,
-    GamblingData,
     GamblingError,
+    GameCache,
     GameDelta,
     GameRow,
     Result,
@@ -33,11 +33,12 @@ use crate::{
 };
 
 impl Commands {
-    pub async fn higher_lower<Data: GamblingData + EmojiCacheData>(
+    pub async fn higher_lower(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
         pool: &PgPool,
+        cache: &GameCache,
     ) -> Result<()> {
         let mut options = parse_options(options);
 
@@ -45,13 +46,13 @@ impl Commands {
             return Err(GamblingError::InvalidAmount);
         };
 
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
         let emojis = {
             let data = data_lock.read().await;
             data.emojis()
         };
 
-        data_lock.read().await.game_cache().check_and_set(interaction.user.id)?;
+        cache.check_and_set(interaction.user.id)?;
 
         let mut row = GameRow::get(pool, interaction.user.id)
             .await?

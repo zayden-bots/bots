@@ -18,7 +18,7 @@ use sqlx::PgPool;
 use sqlx::prelude::FromRow;
 use tracing::warn;
 use zayden_core::limits::embed::FIELD_VALUE as MAX_FIELD_VALUE;
-use zayden_core::{CronJobData, UserTimezone, as_u64, parse_modal_components};
+use zayden_core::{UserTimezone, as_u64, parse_modal_components};
 
 use super::start_time;
 use crate::cron::create_reminders;
@@ -52,7 +52,7 @@ impl GuildRow {
 pub struct Create;
 
 impl Create {
-    pub async fn run<Data: CronJobData>(
+    pub async fn run(
         ctx: &Context,
         interaction: &ModalInteraction,
         pool: &PgPool,
@@ -188,7 +188,7 @@ impl Create {
 
         let post = post.id(thread.id).build();
 
-        create_reminders::<Data>(ctx, &post).await;
+        create_reminders(ctx, &post).await;
 
         PostRow::save(pool, post).await?;
 

@@ -19,10 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV SQLX_OFFLINE=true
 
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json --bin bot
+RUN cargo chef cook --release --recipe-path recipe.json --bin zayden
 
 COPY . .
-RUN cargo build --release --bin bot
+RUN cargo build --release --bin zayden
 
 # Stage 3: fetch yt-dlp
 FROM debian:trixie-slim AS ytdlp
@@ -75,7 +75,7 @@ RUN groupadd --system zayden && useradd --system --gid zayden zayden \
     && mkdir -p /app/palworld_uploads /app/.deno \
     && chown -R zayden:zayden /app
 
-COPY --from=builder /app/target/release/bot /usr/local/bin/zayden-bot
+COPY --from=builder /app/target/release/zayden /usr/local/bin/zayden-bot
 
 USER zayden
 ENTRYPOINT ["zayden-bot"]

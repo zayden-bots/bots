@@ -17,7 +17,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCache, EmojiCacheData, FormatNum, as_i64};
+use zayden_core::{EmojiCache, FormatNum, RuntimeState, as_i64};
 
 use super::Commands;
 use crate::commands::inventory::InventoryManager;
@@ -177,7 +177,7 @@ impl MaxBet for ProfileRow {
 }
 
 impl Commands {
-    pub async fn profile<Data: EmojiCacheData>(
+    pub async fn profile(
         ctx: &Context,
         interaction: &CommandInteraction,
         mut options: Vec<ResolvedOption<'_>>,
@@ -199,7 +199,7 @@ impl Commands {
         let inventory_row = InventoryManager::inventory_items(pool, user.id).await?;
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

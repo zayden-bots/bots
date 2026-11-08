@@ -7,7 +7,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, parse_options_ref};
+use zayden_core::{FormatNum, RuntimeState, parse_options_ref};
 
 use crate::common::shop::{ShopDelta, ShopManager, ShopRow};
 use crate::events::{Dispatch, Event, ShopPurchaseEvent};
@@ -23,7 +23,7 @@ use crate::{
     ShopPage,
 };
 
-pub async fn buy<Data: EmojiCacheData>(
+pub async fn buy(
     ctx: &Context,
     interaction: &CommandInteraction,
     pool: &PgPool,
@@ -124,7 +124,7 @@ pub async fn buy<Data: EmojiCacheData>(
     }
 
     let emojis = {
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
         let data = data_lock.read().await;
         data.emojis()
     };

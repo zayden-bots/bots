@@ -5,8 +5,8 @@
 //! TimedOut)`. The request carried no budget of its own, so it rode the shared
 //! client's 30s *total-request* cap, got one shot at the upstream, and burned
 //! the full 30s before failing — once per feed, in series, inside a cron job
-//! `bot::cron::run_cron_jobs_loop` awaits inline. Four wedged feeds therefore
-//! held the entire scheduler for two minutes.
+//! `bot_runtime::cron::run_cron_jobs_loop` awaits inline. Four wedged feeds
+//! therefore held the entire scheduler for two minutes.
 //!
 //! The tests below pin the two halves of the fix: a per-request budget tighter
 //! than the client cap, and retries that only spend themselves on failures
@@ -281,7 +281,7 @@ fn the_production_news_budget_stays_inside_the_cron_loop_it_blocks() {
         .sum();
     let worst_case = news::NEWS_TIMEOUT * news::NEWS_RETRY.attempts + backoff;
 
-    // `bot::cron::run_cron_jobs_loop` awaits its due jobs inline and the
+    // `bot_runtime::cron::run_cron_jobs_loop` awaits its due jobs inline and the
     // shortest job in the workspace runs every minute, so a fully wedged poll
     // has to unblock the loop before the next minute's jobs are due. The feeds
     // are polled concurrently, so this is the whole job's worst case, not one

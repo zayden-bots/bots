@@ -6,8 +6,6 @@ mod raidreport;
 mod sensitivity;
 mod socials;
 
-use std::marker::PhantomData;
-
 use async_trait::async_trait;
 use dungeon_report::DungeonReport;
 use goof::Goof;
@@ -22,23 +20,20 @@ use zayden_core::{EventCtx, EventKind, Module, OverlapError, RegistryBuilder};
 
 use crate::GoodMorningCache;
 
-pub struct Llamad2Module<D> {
+pub struct Llamad2Module {
     guild: GuildId,
-    _data: PhantomData<fn() -> D>,
+    good_morning: GoodMorningCache,
 }
 
-impl<D> Llamad2Module<D> {
+impl Llamad2Module {
     #[must_use]
-    pub const fn new(guild: GuildId) -> Self {
-        Self { guild, _data: PhantomData }
+    pub fn new(guild: GuildId) -> Self {
+        Self { guild, good_morning: GoodMorningCache::default() }
     }
 }
 
 #[async_trait]
-impl<D> Module for Llamad2Module<D>
-where
-    D: GoodMorningCache,
-{
+impl Module for Llamad2Module {
     fn id(&self) -> &'static str {
         "llamad2"
     }
@@ -73,7 +68,7 @@ where
                     return Ok(());
                 }
                 let (good_morning, counting) = tokio::join!(
-                    crate::GoodMorning::run::<D>(cx.ctx, new_message),
+                    crate::GoodMorning::run(cx.ctx, new_message, &self.good_morning),
                     crate::CountingFail::run(cx.ctx, new_message, &cx.app.db),
                 );
                 good_morning?;

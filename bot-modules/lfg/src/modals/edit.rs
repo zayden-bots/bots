@@ -9,7 +9,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tracing::debug;
-use zayden_core::{CronJobData, UserTimezone, parse_modal_components};
+use zayden_core::{UserTimezone, parse_modal_components};
 
 use super::start_time;
 use crate::cron::create_reminders;
@@ -20,7 +20,7 @@ use crate::{LfgError, PostBuilder, PostRow, Result};
 pub struct Edit;
 
 impl Edit {
-    pub async fn run<Data: CronJobData>(
+    pub async fn run(
         ctx: &Context,
         interaction: &ModalInteraction,
         pool: &PgPool,
@@ -98,7 +98,7 @@ impl Edit {
         )
         .await?;
 
-        create_reminders::<Data>(ctx, &post).await;
+        create_reminders(ctx, &post).await;
 
         thread
             .widen()

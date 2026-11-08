@@ -6,7 +6,9 @@ use tracing::{error, info, warn};
 use zayden_app::events::AppEvent;
 use zayden_app::state::AppState;
 
-pub fn spawn_patreon_listener(ctx: Context, app: Arc<AppState>) {
+use crate::announce_pending;
+
+pub(crate) fn spawn_patreon_listener(ctx: Context, app: Arc<AppState>) {
     tokio::spawn(async move {
         let mut rx = app.subscribe();
 
@@ -43,7 +45,7 @@ pub fn spawn_patreon_listener(ctx: Context, app: Arc<AppState>) {
 }
 
 async fn announce(ctx: &Context, app: &AppState) {
-    if let Err(e) = patreon::announce_pending(&ctx.http, &app.http, &app.db).await {
+    if let Err(e) = announce_pending(&ctx.http, &app.http, &app.db).await {
         error!(error = ?e, "patreon: failed to announce pending posts");
     }
 }

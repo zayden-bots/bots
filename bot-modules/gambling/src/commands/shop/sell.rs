@@ -7,12 +7,12 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, parse_options_ref};
+use zayden_core::{FormatNum, RuntimeState, parse_options_ref};
 
 use crate::common::shop::SaleDelta;
 use crate::{GamblingError, Result, SHOP_ITEMS, ShopManager};
 
-pub async fn sell<Data: EmojiCacheData>(
+pub async fn sell(
     ctx: &Context,
     interaction: &CommandInteraction,
     pool: &PgPool,
@@ -53,7 +53,7 @@ pub async fn sell<Data: EmojiCacheData>(
             .ok_or(GamblingError::TransactionConflict)?;
 
     let emojis = {
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
         let data = data_lock.read().await;
         data.emojis()
     };

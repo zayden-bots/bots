@@ -8,7 +8,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use zayden_core::error::HandlerError;
-use zayden_core::{CoreError, EmojiCacheData, parse_subcommand};
+use zayden_core::{CoreError, parse_subcommand};
 
 use crate::endgame_analysis::{DimWishlistCommand, TierListCommand, WeaponCommand};
 use crate::loadouts::Loadout;
@@ -31,7 +31,7 @@ impl Command {
             .add_option(RaidGuide::<0>::register())
     }
 
-    pub async fn run<Data: EmojiCacheData>(
+    pub async fn run(
         ctx: &Context,
         interaction: &CommandInteraction,
         pool: &PgPool,
@@ -81,7 +81,7 @@ impl Command {
                 .await?;
             },
             "builds" => {
-                Loadout::run::<Data>(
+                Loadout::run(
                     ctx,
                     interaction,
                     sub_options.into_vec(),

@@ -7,13 +7,13 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::EmojiCacheData;
+use zayden_core::RuntimeState;
 
 use crate::commands::inventory::InventoryManager;
 use crate::shop::shop_response;
 use crate::{Result, ShopManager, ShopPage, ShopRow};
 
-pub async fn list<Data: EmojiCacheData>(
+pub async fn list(
     ctx: &Context,
     interaction: &CommandInteraction,
     pool: &PgPool,
@@ -34,7 +34,7 @@ pub async fn list<Data: EmojiCacheData>(
         InventoryManager::inventory_items(pool, interaction.user.id).await?;
 
     let emojis = {
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
         let data = data_lock.read().await;
         data.emojis()
     };

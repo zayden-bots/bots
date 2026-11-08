@@ -1,25 +1,15 @@
 use std::borrow::Cow;
-use std::marker::PhantomData;
 
 use async_trait::async_trait;
 use serenity::all::CreateCommand;
-use zayden_core::{
-    EmojiCacheData,
-    GuildMembersCache,
-    HandlerError,
-    InvocationCtx,
-    ModuleCommand,
-};
+use zayden_core::{HandlerError, InvocationCtx, ModuleCommand};
 
-use crate::{Commands, GamblingData};
+use crate::Commands;
 
-pub(super) struct Inventory<D>(pub(super) PhantomData<fn() -> D>);
+pub(super) struct Inventory;
 
 #[async_trait]
-impl<D> ModuleCommand for Inventory<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleCommand for Inventory {
     fn name(&self) -> Cow<'static, str> {
         Cow::Borrowed("inventory")
     }
@@ -34,8 +24,7 @@ where
 
     async fn run(&self, cx: &InvocationCtx<'_>) -> Result<(), HandlerError> {
         let options = cx.interaction.data.options();
-        Commands::inventory::<D>(cx.ctx, cx.interaction, options, &cx.app.db)
-            .await?;
+        Commands::inventory(cx.ctx, cx.interaction, options, &cx.app.db).await?;
         Ok(())
     }
 }

@@ -5,13 +5,13 @@ use jiff::{Span, Timestamp};
 use serenity::all::{Context, GuildId};
 use sqlx::PgPool;
 use tracing::error;
-use zayden_core::{CronJobData, as_i64};
+use zayden_core::as_i64;
 
 use crate::party::cron::{self, PROVISION_LEAD};
 use crate::party::lifecycle;
 use crate::party::row::PartyRow;
 
-pub async fn guild_create<Data: CronJobData>(
+pub async fn guild_create(
     ctx: &Context,
     runtime: &Arc<JellyfinRuntime>,
     pool: &PgPool,
@@ -52,6 +52,6 @@ pub async fn guild_create<Data: CronJobData>(
         // Whatever is still in the future gets its jobs back. Missed reminders
         // are deliberately not replayed — a "starts in 24 hours" ping sent after
         // the party is worse than silence.
-        cron::create_jobs::<Data>(ctx, runtime, party).await;
+        cron::create_jobs(ctx, runtime, party).await;
     }
 }

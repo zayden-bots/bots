@@ -8,7 +8,7 @@ use serenity::all::{
 };
 use sqlx::{FromRow, PgPool};
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, as_i64};
+use zayden_core::{FormatNum, RuntimeState, as_i64};
 
 use crate::{GamblingError, MaxValues, MineHourly, Mining, Prestige, Result};
 
@@ -131,7 +131,7 @@ impl MineHourly for MineRow {
 use super::Commands;
 
 impl Commands {
-    pub async fn mine<Data: EmojiCacheData>(
+    pub async fn mine(
         ctx: &Context,
         interaction: &CommandInteraction,
         pool: &PgPool,
@@ -141,7 +141,7 @@ impl Commands {
         let row = MineRow::get(pool, interaction.user.id).await?.unwrap_or_default();
 
         let coin = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis().emoji("heads").map_err(|n| {
                 GamblingError::Internal(format!("emoji '{n}' not in cache"))

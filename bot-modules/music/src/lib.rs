@@ -13,6 +13,7 @@ pub mod player;
 pub mod queue;
 pub mod radio;
 pub mod resolve;
+mod resolver_config;
 pub mod track;
 pub mod voice;
 

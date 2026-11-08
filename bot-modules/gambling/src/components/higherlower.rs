@@ -15,7 +15,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCache, EmojiCacheData, FormatNum};
+use zayden_core::{EmojiCache, FormatNum, RuntimeState};
 
 use crate::components::HigherLowerCustomId;
 use crate::events::{Dispatch, Event, GameEvent};
@@ -53,7 +53,7 @@ impl HigherLower {
 }
 
 impl HigherLower {
-    pub async fn run_components<Data: EmojiCacheData>(
+    pub async fn run_components(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
@@ -61,7 +61,7 @@ impl HigherLower {
         let guess = interaction.data.custom_id.parse::<HigherLowerCustomId>()?;
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

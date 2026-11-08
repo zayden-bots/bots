@@ -8,7 +8,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum};
+use zayden_core::{FormatNum, RuntimeState};
 
 use crate::shop::LOTTO_TICKET;
 use crate::{
@@ -22,7 +22,7 @@ use crate::{
 };
 
 impl Commands {
-    pub async fn lotto<Data: EmojiCacheData>(
+    pub async fn lotto(
         ctx: &Context,
         interaction: &CommandInteraction,
         pool: &PgPool,
@@ -38,7 +38,7 @@ impl Commands {
             .unwrap_or_else(|| LottoRow::new(interaction.user.id));
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };
@@ -46,7 +46,7 @@ impl Commands {
         let lotto_emoji = LOTTO_TICKET.emoji(&emojis)?;
 
         let timestamp = {
-            Lotto::cron_job::<Data>()
+            Lotto::cron_job()
                 .map_err(|e| {
                     GamblingError::Internal(format!(
                         "lotto cron schedule invalid: {e}"

@@ -15,13 +15,13 @@ pub mod sell;
 pub use buy::buy;
 pub use list::list;
 pub use sell::sell;
-use zayden_core::{EmojiCacheData, parse_subcommand};
+use zayden_core::parse_subcommand;
 
 use super::Commands;
 use crate::{GamblingError, Result, SHOP_ITEMS, ShopPage};
 
 impl Commands {
-    pub async fn shop<Data: EmojiCacheData>(
+    pub async fn shop(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -33,13 +33,13 @@ impl Commands {
 
         match name {
             "list" => {
-                list::<Data>(ctx, interaction, pool, &options).await?;
+                list(ctx, interaction, pool, &options).await?;
             },
             "buy" => {
-                buy::<Data>(ctx, interaction, pool, &options).await?;
+                buy(ctx, interaction, pool, &options).await?;
             },
             "sell" => {
-                sell::<Data>(ctx, interaction, pool, &options).await?;
+                sell(ctx, interaction, pool, &options).await?;
             },
             _ => return Err(GamblingError::InvalidAmount),
         }

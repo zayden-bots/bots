@@ -11,7 +11,6 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tracing::debug;
-use zayden_core::CronJobData;
 
 use crate::cron::create_reminders;
 use crate::modals::create::GuildRow;
@@ -30,7 +29,7 @@ pub async fn thread_delete(
     Ok(())
 }
 
-pub async fn guild_create<Data: CronJobData>(
+pub async fn guild_create(
     ctx: &Context,
     guild: &Guild,
     pool: &PgPool,
@@ -105,7 +104,7 @@ pub async fn guild_create<Data: CronJobData>(
         let start_time = post.start_time.to_jiff().to_zoned(TimeZone::UTC);
 
         if start_time > now {
-            create_reminders::<Data>(ctx, &post).await;
+            create_reminders(ctx, &post).await;
         }
 
         if start_time < now

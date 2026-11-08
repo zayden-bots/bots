@@ -1,13 +1,11 @@
 use std::borrow::Cow;
-use std::marker::PhantomData;
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use serenity::all::CreateCommand;
 use tracing::debug;
 use zayden_core::{
     ComponentCtx,
-    EmojiCacheData,
-    GuildMembersCache,
     HandlerError,
     IdMatch,
     InvocationCtx,
@@ -17,15 +15,12 @@ use zayden_core::{
 };
 
 use crate::components::BlackjackCustomId;
-use crate::{Commands, GamblingData};
+use crate::{Commands, GameCache};
 
-pub(super) struct Blackjack<D>(pub(super) PhantomData<fn() -> D>);
+pub(super) struct Blackjack(pub(super) Arc<GameCache>);
 
 #[async_trait]
-impl<D> ModuleCommand for Blackjack<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleCommand for Blackjack {
     fn name(&self) -> Cow<'static, str> {
         Cow::Borrowed("blackjack")
     }
@@ -40,17 +35,14 @@ where
 
     async fn run(&self, cx: &InvocationCtx<'_>) -> Result<(), HandlerError> {
         let options = cx.interaction.data.options();
-        Commands::blackjack::<D>(cx.ctx, cx.interaction, options, &cx.app.db)
+        Commands::blackjack(cx.ctx, cx.interaction, options, &cx.app.db, &self.0)
             .await?;
         Ok(())
     }
 }
 
 #[async_trait]
-impl<D> ModuleComponent for Blackjack<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleComponent for Blackjack {
     fn module(&self) -> Option<&'static str> {
         Some("gambling")
     }
@@ -73,7 +65,7 @@ where
 
         match cx.interaction.data.custom_id.parse::<BlackjackCustomId>()? {
             BlackjackCustomId::Hit => {
-                crate::components::Blackjack::hit::<D>(
+                crate::components::Blackjack::hit(
                     cx.ctx,
                     cx.interaction,
                     &cx.app.db,
@@ -81,7 +73,7 @@ where
                 .await?;
             },
             BlackjackCustomId::Stand => {
-                crate::components::Blackjack::stand::<D>(
+                crate::components::Blackjack::stand(
                     cx.ctx,
                     cx.interaction,
                     &cx.app.db,
@@ -89,7 +81,7 @@ where
                 .await?;
             },
             BlackjackCustomId::Double => {
-                crate::components::Blackjack::double::<D>(
+                crate::components::Blackjack::double(
                     cx.ctx,
                     cx.interaction,
                     &cx.app.db,
@@ -97,7 +89,7 @@ where
                 .await?;
             },
             BlackjackCustomId::Split => {
-                crate::components::Blackjack::split::<D>(
+                crate::components::Blackjack::split(
                     cx.ctx,
                     cx.interaction,
                     &cx.app.db,
@@ -105,7 +97,7 @@ where
                 .await?;
             },
             BlackjackCustomId::Surrender => {
-                crate::components::Blackjack::surrender::<D>(
+                crate::components::Blackjack::surrender(
                     cx.ctx,
                     cx.interaction,
                     &cx.app.db,

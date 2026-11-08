@@ -22,7 +22,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCache, EmojiCacheData, as_u64, message_metadata};
+use zayden_core::{EmojiCache, RuntimeState, as_u64, message_metadata};
 
 use crate::components::TicTacToeCustomId;
 use crate::games::tiktactoe::{EMOJI_P1, EMOJI_P2};
@@ -38,7 +38,7 @@ pub struct TicTacToe {
 }
 
 impl TicTacToe {
-    pub async fn run_component<Data: EmojiCacheData>(
+    pub async fn run_component(
         ctx: &Context,
         interaction: &ComponentInteraction,
         pool: &PgPool,
@@ -46,7 +46,7 @@ impl TicTacToe {
         let metadata = message_metadata(&interaction.message)?;
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

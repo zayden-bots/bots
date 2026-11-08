@@ -17,7 +17,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, sole_option};
+use zayden_core::{RuntimeState, sole_option};
 
 use super::Commands;
 use crate::games::blackjack::{
@@ -36,19 +36,20 @@ use crate::models::gambling::GamblingManager;
 use crate::{
     CARD_DECK,
     EffectsManager,
-    GamblingData,
     GamblingError,
+    GameCache,
     Result,
     ShopCurrency,
     card_deck,
 };
 
 impl Commands {
-    pub async fn blackjack<Data: GamblingData + EmojiCacheData>(
+    pub async fn blackjack(
         ctx: &Context,
         interaction: &CommandInteraction,
         mut options: Vec<ResolvedOption<'_>>,
         pool: &PgPool,
+        cache: &GameCache,
     ) -> Result<()> {
         interaction.defer(&ctx.http).await?;
 
@@ -60,11 +61,7 @@ impl Commands {
 
         tx.commit().await?;
 
-        ctx.data::<RwLock<Data>>()
-            .read()
-            .await
-            .game_cache()
-            .check_and_set(interaction.user.id)?;
+        cache.check_and_set(interaction.user.id)?;
         EffectsManager::bet_limit(pool, interaction.user.id, bet, coins).await?;
         if !GamblingManager::bet(pool, interaction.user.id, bet).await? {
             return Err(GamblingError::InsufficientFunds {
@@ -74,7 +71,7 @@ impl Commands {
         }
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

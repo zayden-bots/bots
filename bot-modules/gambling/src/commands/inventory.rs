@@ -21,7 +21,7 @@ use sqlx::{PgConnection, PgPool};
 use tokio::sync::RwLock;
 use zayden_core::{
     EmojiCache,
-    EmojiCacheData,
+    RuntimeState,
     as_i64,
     parse_options,
     parse_subcommand,
@@ -269,7 +269,7 @@ impl Mining for InventoryRow {
 }
 
 impl Commands {
-    pub async fn inventory<Data: EmojiCacheData>(
+    pub async fn inventory(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -280,8 +280,8 @@ impl Commands {
         let (name, options) = parse_subcommand(options)?;
 
         match name {
-            "show" => show::<Data>(ctx, interaction, pool).await,
-            "use" => use_item::<Data>(ctx, interaction, options, pool).await,
+            "show" => show(ctx, interaction, pool).await,
+            "use" => use_item(ctx, interaction, options, pool).await,
             _ => Err(GamblingError::InvalidAmount),
         }
     }
@@ -321,7 +321,7 @@ impl Commands {
     }
 }
 
-async fn show<Data: EmojiCacheData>(
+async fn show(
     ctx: &Context,
     interaction: &CommandInteraction,
     pool: &PgPool,
@@ -339,7 +339,7 @@ async fn show<Data: EmojiCacheData>(
     };
 
     let emojis = {
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
         let data = data_lock.read().await;
         data.emojis()
     };
@@ -450,7 +450,7 @@ async fn show<Data: EmojiCacheData>(
     Ok(())
 }
 
-async fn use_item<Data: EmojiCacheData>(
+async fn use_item(
     ctx: &Context,
     interaction: &CommandInteraction,
     options: FixedArray<ResolvedOption<'_>>,
@@ -506,7 +506,7 @@ async fn use_item<Data: EmojiCacheData>(
     tx.commit().await?;
 
     let emojis = {
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
         let data = data_lock.read().await;
         data.emojis()
     };

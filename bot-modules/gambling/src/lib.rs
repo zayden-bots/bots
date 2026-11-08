@@ -10,7 +10,6 @@ use zayden_core::EmojiCache;
 pub mod commands;
 pub mod common;
 pub mod components;
-pub mod ctx_data;
 mod discord;
 pub mod error;
 pub mod events;
@@ -43,7 +42,6 @@ pub use common::{
     ShopRow,
     shop,
 };
-pub use ctx_data::GamblingData;
 pub use discord::GamblingModule;
 pub use error::{GamblingError, Result};
 pub use game_cache::GameCache;

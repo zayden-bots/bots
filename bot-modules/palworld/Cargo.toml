@@ -23,6 +23,7 @@ moka = { workspace = true, features = ["future"] }
 rayon = { workspace = true }
 reqwest = { workspace = true, features = ["rustls", "http2", "json", "query"] }
 scraper = { workspace = true }
+secrecy = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 serenity = { workspace = true, features = [

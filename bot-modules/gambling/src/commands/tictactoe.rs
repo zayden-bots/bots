@@ -14,18 +14,19 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, parse_options};
+use zayden_core::{RuntimeState, parse_options};
 
 use super::Commands;
 use crate::components::TicTacToeCustomId;
-use crate::{Coins, EffectsManager, GamblingData, GamblingError, GameRow, Result};
+use crate::{Coins, EffectsManager, GamblingError, GameCache, GameRow, Result};
 
 impl Commands {
-    pub async fn tictactoe<Data: GamblingData + EmojiCacheData>(
+    pub async fn tictactoe(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
         pool: &PgPool,
+        cache: &GameCache,
     ) -> Result<()> {
         interaction.defer(&ctx.http).await?;
 
@@ -33,9 +34,9 @@ impl Commands {
             .await?
             .unwrap_or_else(|| GameRow::new(interaction.user.id));
 
-        let data_lock = ctx.data::<RwLock<Data>>();
+        let data_lock = ctx.data::<RwLock<RuntimeState>>();
 
-        data_lock.read().await.game_cache().check_and_set(interaction.user.id)?;
+        cache.check_and_set(interaction.user.id)?;
 
         let mut options = parse_options(options);
 

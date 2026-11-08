@@ -19,18 +19,37 @@ use serenity::all::FullEvent;
 use slash_commands::TicketCommand;
 use tracing::debug;
 use zayden_core::error::HandlerError;
-use zayden_core::{EventCtx, EventKind, Module, OverlapError, RegistryBuilder};
+use zayden_core::{
+    CronResult,
+    EventCtx,
+    EventKind,
+    Module,
+    ModuleCtx,
+    ModuleError,
+    OverlapError,
+    RegistryBuilder,
+    StartCtx,
+    require,
+};
 
-use crate::WikiIndex;
+use crate::{
+    SupportIdleCloseCron,
+    SupportIdleCron,
+    SupportIdleGcCron,
+    SupportIdleStaleCron,
+    WikiIndex,
+};
 
 pub struct TicketModule {
     wiki_index: Arc<WikiIndex>,
 }
 
 impl TicketModule {
-    #[must_use]
-    pub const fn new(wiki_index: Arc<WikiIndex>) -> Self {
-        Self { wiki_index }
+    pub fn from_config(cx: &ModuleCtx<'_>) -> Result<Self, ModuleError> {
+        require("ticket", "AI_PROVIDER_KEY", cx.config.ai_provider_key.as_ref())?;
+        let wiki_index = Arc::new(WikiIndex::new(cx.app.http.clone()));
+        WikiIndex::spawn_invalidator(&wiki_index, cx.app.subscribe());
+        Ok(Self { wiki_index })
     }
 }
 
@@ -53,6 +72,25 @@ impl Module for TicketModule {
             .add_component(SupportStillOpen)?
             .add_modal(CreateTicketModal)?;
         Ok(())
+    }
+
+    fn cron_jobs(&self) -> Vec<CronResult> {
+        vec![
+            SupportIdleCron::cron_job(),
+            SupportIdleCloseCron::cron_job(),
+            SupportIdleStaleCron::cron_job(),
+            SupportIdleGcCron::cron_job(),
+        ]
+    }
+
+    fn on_start(&self, cx: &StartCtx<'_>) {
+        let http = Arc::clone(&cx.ctx.http);
+        let app = Arc::clone(&cx.app);
+        let guilds =
+            cx.ready.guilds.iter().map(|guild| guild.id).collect::<Vec<_>>();
+        tokio::spawn(async move {
+            crate::archive::rebuild(&http, &app, &guilds).await;
+        });
     }
 
     fn events(&self) -> &'static [EventKind] {

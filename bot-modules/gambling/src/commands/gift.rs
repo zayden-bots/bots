@@ -17,7 +17,7 @@ use serenity::all::{
 use sqlx::PgPool;
 use sqlx::prelude::FromRow;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, as_i64};
+use zayden_core::{FormatNum, RuntimeState, as_i64};
 
 use crate::events::{Dispatch, Event, SendEvent};
 use crate::{
@@ -182,7 +182,7 @@ impl Coins for RecipientRow {
 }
 
 impl Commands {
-    pub async fn gift<Data: EmojiCacheData>(
+    pub async fn gift(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -220,7 +220,7 @@ impl Commands {
         }
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

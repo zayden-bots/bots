@@ -9,11 +9,17 @@ use zayden_core::ctx::ComponentCtx;
 use zayden_core::error::HandlerError;
 use zayden_core::module::ModuleComponent;
 use zayden_core::scope::IdMatch;
-use zayden_core::{Module, OverlapError, RegistryBuilder};
+use zayden_core::{CronResult, Module, OverlapError, RegistryBuilder};
 
 use crate::components::link_cancel;
 use crate::quick_connect::CANCEL_PREFIX;
-use crate::{JellyfinError, JellyfinRuntime};
+use crate::{
+    JellyfinError,
+    JellyfinGameRoundReaperCron,
+    JellyfinIndexRefreshCron,
+    JellyfinRollupCron,
+    JellyfinRuntime,
+};
 
 #[derive(Clone)]
 pub struct RuntimeHandle(Option<Arc<JellyfinRuntime>>);
@@ -87,5 +93,15 @@ impl Module for JellyfinModule {
             .add_component(LinkCancel { runtime: self.runtime.clone() })?;
 
         Ok(())
+    }
+
+    fn cron_jobs(&self) -> Vec<CronResult> {
+        self.runtime.as_option().map_or_else(Vec::new, |runtime| {
+            vec![
+                JellyfinIndexRefreshCron::cron_job(Arc::clone(runtime)),
+                JellyfinRollupCron::cron_job(Arc::clone(runtime)),
+                JellyfinGameRoundReaperCron::cron_job(),
+            ]
+        })
     }
 }

@@ -1,7 +1,6 @@
 mod slash_command;
 
 use std::borrow::Cow;
-use std::marker::PhantomData;
 
 use async_trait::async_trait;
 use serenity::all::FullEvent;
@@ -10,14 +9,7 @@ use zayden_core::ctx::{ComponentCtx, ModalCtx};
 use zayden_core::error::HandlerError;
 use zayden_core::module::{ModuleComponent, ModuleModal};
 use zayden_core::scope::IdMatch;
-use zayden_core::{
-    CronJobData,
-    EventCtx,
-    EventKind,
-    Module,
-    OverlapError,
-    RegistryBuilder,
-};
+use zayden_core::{EventCtx, EventKind, Module, OverlapError, RegistryBuilder};
 
 use crate::{Components, KickComponent, TagsComponent};
 
@@ -181,62 +173,53 @@ impl ModuleComponent for LfgTagsRemove {
 
 // region: Modals
 
-struct LfgEditModal<D>(PhantomData<fn() -> D>);
+struct LfgEditModal;
 
 #[async_trait]
-impl<D> ModuleModal for LfgEditModal<D>
-where
-    D: CronJobData + Send + Sync + 'static,
-{
+impl ModuleModal for LfgEditModal {
     fn id_match(&self) -> IdMatch {
         IdMatch::Exact(Cow::Borrowed("lfg_edit"))
     }
 
     async fn run(&self, cx: &ModalCtx<'_>) -> Result<(), HandlerError> {
-        crate::modals::Edit::run::<D>(cx.ctx, cx.interaction, &cx.app.db).await?;
+        crate::modals::Edit::run(cx.ctx, cx.interaction, &cx.app.db).await?;
         Ok(())
     }
 }
 
-struct LfgCreateModal<D>(PhantomData<fn() -> D>);
+struct LfgCreateModal;
 
 #[async_trait]
-impl<D> ModuleModal for LfgCreateModal<D>
-where
-    D: CronJobData + Send + Sync + 'static,
-{
+impl ModuleModal for LfgCreateModal {
     fn id_match(&self) -> IdMatch {
         IdMatch::Prefix(Cow::Borrowed("lfg_create"))
     }
 
     async fn run(&self, cx: &ModalCtx<'_>) -> Result<(), HandlerError> {
-        crate::modals::Create::run::<D>(cx.ctx, cx.interaction, &cx.app.db).await?;
+        crate::modals::Create::run(cx.ctx, cx.interaction, &cx.app.db).await?;
         Ok(())
     }
 }
 
 // endregion
 
-pub struct LfgModule<D>(PhantomData<fn() -> D>);
+pub struct LfgModule;
 
-impl<D> LfgModule<D> {
+impl LfgModule {
     #[must_use]
     pub const fn new() -> Self {
-        Self(PhantomData)
+        Self
     }
 }
 
-impl<D> Default for LfgModule<D> {
+impl Default for LfgModule {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[async_trait]
-impl<D> Module for LfgModule<D>
-where
-    D: CronJobData + Send + Sync + 'static,
-{
+impl Module for LfgModule {
     fn id(&self) -> &'static str {
         "lfg"
     }
@@ -255,8 +238,8 @@ where
             .add_component(LfgDelete)?
             .add_component(LfgTagsAdd)?
             .add_component(LfgTagsRemove)?
-            .add_modal(LfgEditModal::<D>(PhantomData))?
-            .add_modal(LfgCreateModal::<D>(PhantomData))?;
+            .add_modal(LfgEditModal)?
+            .add_modal(LfgCreateModal)?;
         Ok(())
     }
 
@@ -275,7 +258,7 @@ where
     ) -> Result<(), HandlerError> {
         match ev {
             FullEvent::GuildCreate { guild, .. } => {
-                crate::events::guild_create::<D>(cx.ctx, guild, &cx.app.db).await?;
+                crate::events::guild_create(cx.ctx, guild, &cx.app.db).await?;
             },
             FullEvent::ThreadDelete { thread, .. } => {
                 crate::events::thread_delete(&cx.ctx.http, thread, &cx.app.db)

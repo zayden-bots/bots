@@ -11,7 +11,7 @@ use serenity::all::{
 };
 use sqlx::{FromRow, PgPool};
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, as_i64};
+use zayden_core::{FormatNum, RuntimeState, as_i64};
 
 use super::Commands;
 use crate::{
@@ -135,7 +135,7 @@ impl MaxBet for DailyRow {
 }
 
 impl Commands {
-    pub async fn daily<Data: EmojiCacheData>(
+    pub async fn daily(
         ctx: &Context,
         interaction: &CommandInteraction,
         pool: &PgPool,
@@ -188,7 +188,7 @@ impl Commands {
             .collect::<String>();
 
         let coin = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis().emoji("heads").map_err(|n| {
                 GamblingError::Internal(format!("emoji '{n}' not in cache"))

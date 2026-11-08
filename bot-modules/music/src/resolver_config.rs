@@ -1,7 +1,12 @@
 use std::sync::Arc;
 
 use jiff::Timestamp;
-use music::{
+use secrecy::ExposeSecret;
+use tracing::{error, info, warn};
+use zayden_app::config::BotConfig;
+use zayden_core::ModuleError;
+
+use crate::{
     CompositeResolver,
     CookieJar,
     Genre,
@@ -12,16 +17,12 @@ use music::{
     YouTubeResolver,
     probe_yt_dlp,
 };
-use secrecy::ExposeSecret;
-use tracing::{error, info, warn};
-use zayden_app::config::BotConfig;
-
-use crate::{BotError, Result};
 
 pub(crate) async fn build_resolver(
     config: &BotConfig,
-) -> Result<Arc<dyn TrackResolver>> {
-    let youtube = YouTubeResolver::new().map_err(BotError::from)?;
+) -> Result<Arc<dyn TrackResolver>, ModuleError> {
+    let youtube =
+        YouTubeResolver::new().map_err(|e| ModuleError::init("music", e))?;
     let youtube = match open_cookie_jar(config) {
         Some(jar) => youtube.with_cookies(jar),
         None => youtube,
@@ -43,7 +44,7 @@ pub(crate) async fn build_resolver(
                 creds.client_secret.expose_secret().to_owned(),
             )
             .await
-            .map_err(BotError::from)?;
+            .map_err(|e| ModuleError::init("music", e))?;
             Some(resolver)
         },
         None => {
@@ -69,7 +70,8 @@ pub(crate) async fn build_resolver(
             );
         }
     }
-    let radio = RadioResolver::new(stations).map_err(BotError::from)?;
+    let radio =
+        RadioResolver::new(stations).map_err(|e| ModuleError::init("music", e))?;
 
     Ok(Arc::new(CompositeResolver::new(youtube, spotify, radio)))
 }

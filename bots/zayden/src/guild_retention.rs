@@ -1,33 +1,36 @@
 use std::sync::Arc;
 
 use patreon::{PatreonApp, PatreonConnection};
-use serenity::all::Context;
-use tokio::sync::RwLock;
 use tracing::{error, info};
 use youtube::{YoutubeConnection, YoutubeRuntime};
 use zayden_app::guilds::{GuildPresence, RETENTION_DAYS};
 use zayden_app::state::AppState;
 use zayden_core::CronJob;
 
-use crate::BotState;
-
-pub struct GuildRetentionCron;
+pub(crate) struct GuildRetentionCron;
 
 impl GuildRetentionCron {
-    pub fn cron_job() -> Result<CronJob, jiff_cron::error::Error> {
+    pub(crate) fn cron_job(
+        app: Arc<AppState>,
+        patreon: Option<Arc<PatreonApp>>,
+        youtube: Option<YoutubeRuntime>,
+    ) -> Result<CronJob, jiff_cron::error::Error> {
         CronJob::new("guild_retention_purge", "0 30 4 * * * *").map(|job| {
-            job.set_action(|ctx, _pool| async move { purge_expired(&ctx).await })
+            job.set_action(move |_ctx, _pool| {
+                let app = Arc::clone(&app);
+                let patreon = patreon.clone();
+                let youtube = youtube.clone();
+                async move { purge_expired(&app, patreon, youtube).await }
+            })
         })
     }
 }
 
-async fn purge_expired(ctx: &Context) {
-    let (app, patreon, youtube) = {
-        let data = ctx.data::<RwLock<BotState>>();
-        let state = data.read().await;
-        (Arc::clone(&state.app), state.patreon.clone(), state.youtube.clone())
-    };
-
+async fn purge_expired(
+    app: &AppState,
+    patreon: Option<Arc<PatreonApp>>,
+    youtube: Option<YoutubeRuntime>,
+) {
     let guilds = match GuildPresence::expired(&app.db, RETENTION_DAYS).await {
         Ok(guilds) => guilds,
         Err(e) => {
@@ -37,7 +40,7 @@ async fn purge_expired(ctx: &Context) {
     };
 
     for guild_id in guilds {
-        purge(&app, patreon.as_deref(), youtube.as_ref(), guild_id).await;
+        purge(app, patreon.as_deref(), youtube.as_ref(), guild_id).await;
     }
 }
 

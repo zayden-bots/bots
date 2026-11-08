@@ -19,12 +19,14 @@ zayden-core = { workspace = true }
 
 async-trait = { workspace = true }
 dashmap = { workspace = true }
+jiff = { workspace = true }
 rand = { workspace = true, features = ["thread_rng"] }
 reqwest = { workspace = true }
 rspotify = { workspace = true, features = [
     "client-reqwest",
     "reqwest-rustls-tls",
 ] }
+secrecy = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 serenity = { workspace = true }

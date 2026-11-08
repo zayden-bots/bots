@@ -45,7 +45,6 @@ use zayden_core::limits::autocomplete::CHOICES as MAX_CHOICES;
 use zayden_core::{
     CoreError,
     EmojiCache,
-    EmojiCacheData,
     EmojiResult,
     parse_subcommand,
     sole_option,
@@ -125,7 +124,7 @@ impl Loadout {
         ))
     }
 
-    pub async fn run<Data: EmojiCacheData>(
+    pub async fn run(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -152,7 +151,7 @@ impl Loadout {
 
         interaction.defer(&ctx.http).await?;
 
-        let component = record.into_component::<Data>(ctx, parent_token).await?;
+        let component = record.into_component(ctx, parent_token).await?;
 
         interaction
             .edit_response(

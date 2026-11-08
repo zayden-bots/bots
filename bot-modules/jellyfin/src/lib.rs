@@ -27,7 +27,7 @@ pub use games::JellyfinGameRoundReaperCron;
 pub use identity::{JellyfinLinkRow, quick_connect};
 pub use index::LibraryItemRow;
 pub use requests::{RequestPlan, Seasons};
-pub use runtime::JellyfinRuntime;
+pub use runtime::{JellyfinRuntime, runtime_from_config};
 pub use settings::{JellyfinConfig, JellyfinSettings, JellyfinStore};
 pub use stats::Streak;
 pub use transport::{JellyfinClient, PlaybackClient, SeerClient};

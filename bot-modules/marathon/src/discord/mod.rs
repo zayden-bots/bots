@@ -4,18 +4,30 @@ mod command;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use zayden_core::{Module, OverlapError, RegistryBuilder};
+use secrecy::{ExposeSecret, SecretString};
+use zayden_core::{CronResult, Module, ModuleCtx, OverlapError, RegistryBuilder};
 
 use crate::client::MarathonClient;
+use crate::cron::{MarathonAnnounceCron, MarathonNewsCron};
 
 pub struct MarathonModule {
     client: Arc<MarathonClient>,
+    http: reqwest::Client,
+    bungie_api_key: Option<SecretString>,
 }
 
 impl MarathonModule {
     #[must_use]
-    pub const fn new(client: Arc<MarathonClient>) -> Self {
-        Self { client }
+    pub fn from_config(cx: &ModuleCtx<'_>) -> Self {
+        let client = Arc::new(MarathonClient::new(
+            cx.app.http.clone(),
+            cx.config.flaresolverr_url.clone(),
+        ));
+        Self {
+            client,
+            http: cx.app.http.clone(),
+            bungie_api_key: cx.config.bungie_api_key.clone(),
+        }
     }
 }
 
@@ -31,5 +43,15 @@ impl Module for MarathonModule {
                 client: Arc::clone(&self.client),
             });
         Ok(())
+    }
+
+    fn cron_jobs(&self) -> Vec<CronResult> {
+        vec![
+            MarathonAnnounceCron::cron_job(Arc::clone(&self.client)),
+            MarathonNewsCron::cron_job(
+                self.http.clone(),
+                self.bungie_api_key.as_ref().map(|k| k.expose_secret().to_owned()),
+            ),
+        ]
     }
 }

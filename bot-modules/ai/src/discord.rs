@@ -11,9 +11,12 @@ use zayden_core::{
     EventKind,
     HandlerError,
     Module,
+    ModuleCtx,
+    ModuleError,
     OverlapError,
     RegistryBuilder,
     as_i64,
+    require,
     server_tier,
 };
 
@@ -24,15 +27,9 @@ use crate::persona::Persona;
 pub struct AiModule;
 
 impl AiModule {
-    #[must_use]
-    pub const fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for AiModule {
-    fn default() -> Self {
-        Self::new()
+    pub fn from_config(cx: &ModuleCtx<'_>) -> Result<Self, ModuleError> {
+        require("ai", "AI_PROVIDER_KEY", cx.config.ai_provider_key.as_ref())?;
+        Ok(Self)
     }
 }
 

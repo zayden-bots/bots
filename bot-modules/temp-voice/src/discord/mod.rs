@@ -40,8 +40,14 @@ pub struct TempVoiceModule {
 
 impl TempVoiceModule {
     #[must_use]
-    pub const fn new(voice_states: Arc<VoiceStateCache>) -> Self {
-        Self { voice_states }
+    pub fn new() -> Self {
+        Self { voice_states: Arc::new(VoiceStateCache::new()) }
+    }
+}
+
+impl Default for TempVoiceModule {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -80,7 +86,7 @@ impl Module for TempVoiceModule {
     }
 
     fn events(&self) -> &'static [EventKind] {
-        &[EventKind::VoiceStateUpdate]
+        &[EventKind::VoiceStateUpdate, EventKind::GuildCreate]
     }
 
     async fn on_event(
@@ -88,6 +94,11 @@ impl Module for TempVoiceModule {
         cx: &EventCtx<'_>,
         ev: &FullEvent,
     ) -> Result<(), HandlerError> {
+        if let FullEvent::GuildCreate { guild, .. } = ev {
+            self.voice_states.guild_create(guild);
+            return Ok(());
+        }
+
         let FullEvent::VoiceStateUpdate { new, .. } = ev else {
             return Ok(());
         };

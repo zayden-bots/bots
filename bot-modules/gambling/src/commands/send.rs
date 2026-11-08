@@ -13,7 +13,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, as_i64, parse_options};
+use zayden_core::{FormatNum, RuntimeState, as_i64, parse_options};
 
 use crate::events::{Dispatch, Event, SendEvent};
 use crate::{
@@ -154,7 +154,7 @@ impl SendManager {
 }
 
 impl Commands {
-    pub async fn send<Data: EmojiCacheData>(
+    pub async fn send(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -214,7 +214,7 @@ impl Commands {
         let stamina = row.stamina_str();
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

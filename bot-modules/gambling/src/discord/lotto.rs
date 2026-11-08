@@ -1,25 +1,15 @@
 use std::borrow::Cow;
-use std::marker::PhantomData;
 
 use async_trait::async_trait;
 use serenity::all::CreateCommand;
-use zayden_core::{
-    EmojiCacheData,
-    GuildMembersCache,
-    HandlerError,
-    InvocationCtx,
-    ModuleCommand,
-};
+use zayden_core::{HandlerError, InvocationCtx, ModuleCommand};
 
-use crate::{Commands, GamblingData};
+use crate::Commands;
 
-pub(super) struct Lotto<D>(pub(super) PhantomData<fn() -> D>);
+pub(super) struct Lotto;
 
 #[async_trait]
-impl<D> ModuleCommand for Lotto<D>
-where
-    D: EmojiCacheData + GamblingData + GuildMembersCache + Send + Sync + 'static,
-{
+impl ModuleCommand for Lotto {
     fn name(&self) -> Cow<'static, str> {
         Cow::Borrowed("lotto")
     }
@@ -33,7 +23,7 @@ where
     }
 
     async fn run(&self, cx: &InvocationCtx<'_>) -> Result<(), HandlerError> {
-        Commands::lotto::<D>(cx.ctx, cx.interaction, &cx.app.db).await?;
+        Commands::lotto(cx.ctx, cx.interaction, &cx.app.db).await?;
         Ok(())
     }
 }

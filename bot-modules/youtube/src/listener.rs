@@ -3,11 +3,12 @@ use std::sync::Arc;
 use serenity::all::Context;
 use tokio::sync::broadcast::error::RecvError;
 use tracing::warn;
-use youtube::YoutubeRuntime;
 use zayden_app::events::AppEvent;
 use zayden_app::state::AppState;
 
-pub fn spawn_youtube_listener(
+use crate::{YoutubeRuntime, announce};
+
+pub(crate) fn spawn_youtube_listener(
     ctx: Context,
     app: Arc<AppState>,
     runtime: YoutubeRuntime,
@@ -23,7 +24,7 @@ pub fn spawn_youtube_listener(
                     let api_key = Arc::clone(&runtime.api_key);
 
                     tokio::spawn(async move {
-                        youtube::announce::on_ping(
+                        announce::on_ping(
                             &ctx.http,
                             &app.http,
                             &app.db,

@@ -10,7 +10,6 @@ use jellyfin::runtime::JellyfinRuntime;
 pub use reaper::JellyfinPartyReaperCron;
 pub use row::{PartyGuestRow, PartyRow, PartyState};
 use serenity::all::Context;
-use zayden_core::CronJobData;
 
 #[derive(Debug, Default)]
 pub enum Scheduled {
@@ -21,17 +20,13 @@ pub enum Scheduled {
 }
 
 impl Scheduled {
-    pub async fn apply<Data: CronJobData>(
-        self,
-        ctx: &Context,
-        runtime: &Arc<JellyfinRuntime>,
-    ) {
+    pub async fn apply(self, ctx: &Context, runtime: &Arc<JellyfinRuntime>) {
         match self {
             Self::Nothing => {},
             Self::Party(party) => {
-                cron::create_jobs::<Data>(ctx, runtime, &party).await;
+                cron::create_jobs(ctx, runtime, &party).await;
             },
-            Self::Clear(party_id) => cron::clear_jobs::<Data>(ctx, party_id).await,
+            Self::Clear(party_id) => cron::clear_jobs(ctx, party_id).await,
         }
     }
 }

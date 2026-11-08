@@ -1,6 +1,6 @@
+use dashmap::DashMap;
 use serenity::Error;
 use serenity::all::{Context, CreateMessage, GenericChannelId, Message, UserId};
-use tokio::sync::RwLock;
 
 const GOOD_MORNINGS: [&str; 8] = [
     "good morning",
@@ -13,31 +13,35 @@ const GOOD_MORNINGS: [&str; 8] = [
     "g morn",
 ];
 
-pub trait GoodMorningCache: Send + Sync + 'static {
-    fn insert(
+#[derive(Default)]
+pub struct GoodMorningCache(DashMap<GenericChannelId, (UserId, bool)>);
+
+impl GoodMorningCache {
+    #[must_use]
+    pub fn insert(
         &self,
         channel_id: GenericChannelId,
         author: UserId,
         is_good_morning: bool,
-    ) -> Option<(UserId, bool)>;
+    ) -> Option<(UserId, bool)> {
+        self.0.insert(channel_id, (author, is_good_morning))
+    }
 }
 
 pub struct GoodMorning;
 
 impl GoodMorning {
-    pub async fn run<Data: GoodMorningCache>(
+    pub async fn run(
         ctx: &Context,
         message: &Message,
+        cache: &GoodMorningCache,
     ) -> Result<(), Error> {
         let content = message.content.to_lowercase();
 
         let is_good_morning = is_good_morning(&content);
 
-        let prev_msg = {
-            let data = ctx.data::<RwLock<Data>>();
-            let data = data.read().await;
-            data.insert(message.channel_id, message.author.id, is_good_morning)
-        };
+        let prev_msg =
+            cache.insert(message.channel_id, message.author.id, is_good_morning);
 
         if should_greet(is_good_morning, message.author.id, prev_msg) {
             message

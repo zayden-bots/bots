@@ -9,8 +9,17 @@ use components::{ControlPanel, QueuePager};
 use serenity::all::FullEvent;
 use songbird::Songbird;
 use zayden_core::error::HandlerError;
-use zayden_core::{EventCtx, EventKind, Module, OverlapError, RegistryBuilder};
+use zayden_core::{
+    EventCtx,
+    EventKind,
+    Module,
+    ModuleCtx,
+    ModuleError,
+    OverlapError,
+    RegistryBuilder,
+};
 
+use crate::resolver_config::build_resolver;
 use crate::{MusicManager, TrackResolver};
 
 pub struct MusicModule {
@@ -20,13 +29,13 @@ pub struct MusicModule {
 }
 
 impl MusicModule {
-    #[must_use]
-    pub const fn new(
+    pub async fn from_config(
+        cx: &ModuleCtx<'_>,
         songbird: Arc<Songbird>,
-        music: Arc<MusicManager>,
-        resolver: Arc<dyn TrackResolver>,
-    ) -> Self {
-        Self { songbird, music, resolver }
+    ) -> Result<Self, ModuleError> {
+        let music = Arc::new(MusicManager::new());
+        let resolver = build_resolver(cx.config).await?;
+        Ok(Self { songbird, music, resolver })
     }
 }
 
@@ -57,7 +66,7 @@ impl Module for MusicModule {
     }
 
     fn events(&self) -> &'static [EventKind] {
-        &[EventKind::VoiceStateUpdate]
+        &[EventKind::VoiceStateUpdate, EventKind::GuildCreate]
     }
 
     async fn on_event(
@@ -65,11 +74,11 @@ impl Module for MusicModule {
         _cx: &EventCtx<'_>,
         ev: &FullEvent,
     ) -> Result<(), HandlerError> {
-        let FullEvent::VoiceStateUpdate { new, .. } = ev else {
-            return Ok(());
-        };
-
-        self.music.occupancy().update(new);
+        if let FullEvent::VoiceStateUpdate { new, .. } = ev {
+            self.music.occupancy().update(new);
+        } else if let FullEvent::GuildCreate { guild, .. } = ev {
+            self.music.occupancy().guild_create(guild);
+        }
         Ok(())
     }
 }

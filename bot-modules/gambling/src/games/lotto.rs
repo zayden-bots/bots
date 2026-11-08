@@ -7,7 +7,7 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::{FromRow, PgConnection, Postgres};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
-use zayden_core::{CronJob, EmojiCacheData, FormatNum, as_i64, as_u64};
+use zayden_core::{CronJob, FormatNum, RuntimeState, as_i64, as_u64};
 
 use crate::shop::LOTTO_TICKET;
 use crate::{Coins, GamblingError, GamblingManager, bot_id};
@@ -134,8 +134,7 @@ pub fn select_winners(
 pub struct Lotto;
 
 impl Lotto {
-    pub fn cron_job<Data: EmojiCacheData>()
-    -> Result<CronJob, jiff_cron::error::Error> {
+    pub fn cron_job() -> Result<CronJob, jiff_cron::error::Error> {
         Ok(CronJob::new("lotto", "0 0 17 * * Fri *")?.set_action(|ctx, pool| async move {
             if let Err(e) = (async {
                 let bot_id = bot_id(&ctx.http)
@@ -165,7 +164,7 @@ impl Lotto {
                 LottoManager::delete_tickets(&mut tx).await?;
 
                 let emojis = {
-                    let data = ctx.data::<RwLock<Data>>();
+                    let data = ctx.data::<RwLock<RuntimeState>>();
                     let data = data.read().await;
                     data.emojis()
                 };

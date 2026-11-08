@@ -11,7 +11,7 @@ use serenity::all::{
 };
 use sqlx::{FromRow, PgPool};
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, as_i64};
+use zayden_core::{RuntimeState, as_i64};
 
 use super::Commands;
 use crate::{
@@ -158,7 +158,7 @@ impl MaxBet for GoalsRow {
 }
 
 impl Commands {
-    pub async fn goals<Data: EmojiCacheData>(
+    pub async fn goals(
         ctx: &Context,
         interaction: &CommandInteraction,
         pool: &PgPool,
@@ -178,7 +178,7 @@ impl Commands {
                 });
 
         let (coin, reset_ts) = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             let coin = data.emojis().emoji("heads").map_err(|n| {
                 GamblingError::Internal(format!("emoji '{n}' not in cache"))

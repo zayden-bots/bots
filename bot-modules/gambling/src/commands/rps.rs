@@ -16,7 +16,7 @@ use serenity::all::{
 };
 use sqlx::PgPool;
 use tokio::sync::RwLock;
-use zayden_core::{EmojiCacheData, FormatNum, parse_options};
+use zayden_core::{FormatNum, RuntimeState, parse_options};
 
 use super::Commands;
 use crate::events::{Dispatch, Event, GameEvent};
@@ -24,19 +24,20 @@ use crate::utils::effects_summary;
 use crate::{
     Coins,
     EffectsManager,
-    GamblingData,
     GamblingError,
+    GameCache,
     GameDelta,
     GameRow,
     Result,
 };
 
 impl Commands {
-    pub async fn rps<Data: GamblingData + EmojiCacheData>(
+    pub async fn rps(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
         pool: &PgPool,
+        cache: &GameCache,
     ) -> Result<()> {
         interaction.defer(&ctx.http).await?;
 
@@ -61,9 +62,7 @@ impl Commands {
 
         let before = row.clone();
 
-        let data = ctx.data::<RwLock<Data>>();
-
-        data.read().await.game_cache().check_and_set(interaction.user.id)?;
+        cache.check_and_set(interaction.user.id)?;
         EffectsManager::bet_limit(pool, interaction.user.id, bet, row.coins())
             .await?;
         row.bet(bet);
@@ -81,7 +80,7 @@ impl Commands {
         };
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

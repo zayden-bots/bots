@@ -16,8 +16,8 @@ use sqlx::prelude::FromRow;
 use tokio::sync::RwLock;
 use zayden_core::{
     EmojiCache,
-    EmojiCacheData,
     FormatNum,
+    RuntimeState,
     as_i64,
     optional_option,
     parse_options,
@@ -161,7 +161,7 @@ pub struct CraftCommit {
 }
 
 impl Commands {
-    pub async fn craft<Data: EmojiCacheData>(
+    pub async fn craft(
         ctx: &Context,
         interaction: &CommandInteraction,
         options: Vec<ResolvedOption<'_>>,
@@ -170,7 +170,7 @@ impl Commands {
         interaction.defer(&ctx.http).await?;
 
         let emojis = {
-            let data_lock = ctx.data::<RwLock<Data>>();
+            let data_lock = ctx.data::<RwLock<RuntimeState>>();
             let data = data_lock.read().await;
             data.emojis()
         };

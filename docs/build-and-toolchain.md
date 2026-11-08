@@ -20,7 +20,7 @@ Both live in the root `Cargo.toml` and pull in opposite directions.
 The VPS bills on memory, so this trades CPU for resident size. Do not "fix" a
 slow release build by loosening these; the cost is intentional.
 
-Measured 2026-08-15 (32-core dev box, `cargo build --release --bin bot` from a
+Measured 2026-08-15 (32-core dev box, `cargo build --release --bin zayden` from a
 cold `target/`): **3m36s wall, 3.0 GB peak RSS, 23.6 MB stripped binary.** The
 peak is the fat-LTO link step — comfortable on a 16 GB CI runner, so the LTO
 settings are not a CI memory risk. If that ever changes, `lto = "thin"` is the

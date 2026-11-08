@@ -8,24 +8,43 @@ use serenity::all::FullEvent;
 use tracing::debug;
 use zayden_core::error::HandlerError;
 use zayden_core::{
+    CronResult,
     EventCtx,
     EventKind,
     Module,
+    ModuleCtx,
+    ModuleError,
     OverlapError,
     RegistryBuilder,
     as_i64,
 };
 
 use crate::DeadlockApi;
+use crate::cron::{
+    DeadlockBriefingCron,
+    DeadlockCacheGcCron,
+    DeadlockLeaderboardCron,
+    DeadlockMatchCron,
+    DeadlockPatchCron,
+    DeadlockRankCron,
+};
 
 pub struct DeadlockModule {
     api: Arc<DeadlockApi>,
+    zayden_id: u64,
 }
 
 impl DeadlockModule {
-    #[must_use]
-    pub const fn new(api: Arc<DeadlockApi>) -> Self {
-        Self { api }
+    pub fn from_config(cx: &ModuleCtx<'_>) -> Result<Self, ModuleError> {
+        let api = Arc::new(
+            DeadlockApi::new(
+                cx.app.http.clone(),
+                cx.app.db.clone(),
+                cx.config.deadlock_api_key.as_ref(),
+            )
+            .map_err(|e| ModuleError::init("deadlock", e))?,
+        );
+        Ok(Self { api, zayden_id: cx.app.zayden_id })
     }
 }
 
@@ -39,6 +58,17 @@ impl Module for DeadlockModule {
         b.add_command(command::Deadlock { api: Arc::clone(&self.api) })
             .add_autocomplete(autocomplete::Deadlock { api: Arc::clone(&self.api) });
         Ok(())
+    }
+
+    fn cron_jobs(&self) -> Vec<CronResult> {
+        vec![
+            DeadlockPatchCron::cron_job(Arc::clone(&self.api), self.zayden_id),
+            DeadlockMatchCron::cron_job(Arc::clone(&self.api), self.zayden_id),
+            DeadlockRankCron::cron_job(Arc::clone(&self.api), self.zayden_id),
+            DeadlockLeaderboardCron::cron_job(Arc::clone(&self.api), self.zayden_id),
+            DeadlockBriefingCron::cron_job(),
+            DeadlockCacheGcCron::cron_job(),
+        ]
     }
 
     fn events(&self) -> &'static [EventKind] {
