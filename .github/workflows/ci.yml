@@ -171,6 +171,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: ${{ github.event_name != 'pull_request' }}
           build-args: |
+            BUILD_SHA=${{ github.sha }}
             BIN=${{ matrix.bin }}
             ${{ matrix.needs_ytdlp && format('YTDLP_VERSION={0}', steps.ytdlp.outputs.version) || '' }}
           tags: ${{ steps.meta.outputs.tags }}

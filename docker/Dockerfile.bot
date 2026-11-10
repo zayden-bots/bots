@@ -80,5 +80,7 @@ RUN groupadd --system zayden && useradd --system --gid zayden zayden \
 
 COPY --from=builder /app/target/release/${BIN} /usr/local/bin/bot
 
+ARG BUILD_SHA=dev
+ENV BUILD_SHA=$BUILD_SHA
 USER zayden
 ENTRYPOINT ["bot"]
