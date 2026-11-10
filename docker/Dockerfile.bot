@@ -10,6 +10,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 # Stage 2: build
 FROM chef AS builder
+ARG BIN=zayden
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake clang libclang-dev nasm perl \
@@ -19,10 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV SQLX_OFFLINE=true
 
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json --bin zayden
+RUN cargo chef cook --release --recipe-path recipe.json --bin ${BIN}
 
 COPY . .
-RUN cargo build --release --bin zayden
+RUN cargo build --release --bin ${BIN}
 
 # Stage 3: fetch yt-dlp
 FROM debian:trixie-slim AS ytdlp
@@ -58,6 +59,7 @@ RUN set -eux; \
 
 # Stage 4: runtime
 FROM debian:trixie-slim AS runtime
+ARG BIN=zayden
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -75,7 +77,7 @@ RUN groupadd --system zayden && useradd --system --gid zayden zayden \
     && mkdir -p /app/palworld_uploads /app/.deno \
     && chown -R zayden:zayden /app
 
-COPY --from=builder /app/target/release/zayden /usr/local/bin/zayden-bot
+COPY --from=builder /app/target/release/${BIN} /usr/local/bin/bot
 
 USER zayden
-ENTRYPOINT ["zayden-bot"]
+ENTRYPOINT ["bot"]

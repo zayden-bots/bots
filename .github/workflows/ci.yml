@@ -25,8 +25,6 @@ env:
   CARGO_NET_RETRY: 10
   RUSTUP_MAX_RETRIES: 10
   SQLX_OFFLINE: true
-  TAILWIND_VERSION: 4.3.2
-  TAILWIND_SHA256: 5036c4fb4328e0bcdbb6065c70d8ac9452e0d4c947113a788a8f94fd390425c1
 
 jobs:
   fmt:
@@ -54,15 +52,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           cache-on-failure: true
-      # Every job that compiles `web` reuses this step through the alias.
-      - &fetch-tailwind
-        name: Fetch Tailwind CLI
-        run: |
-          curl -fsSL --retry 3 -o "$RUNNER_TEMP/tailwindcss" \
-            "https://github.com/tailwindlabs/tailwindcss/releases/download/v${TAILWIND_VERSION}/tailwindcss-linux-x64"
-          echo "${TAILWIND_SHA256}  $RUNNER_TEMP/tailwindcss" | sha256sum -c -
-          chmod +x "$RUNNER_TEMP/tailwindcss"
-          echo "TAILWIND_CLI=$RUNNER_TEMP/tailwindcss" >> "$GITHUB_ENV"
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - uses: ./.github/actions/cancel-run
         if: failure()
@@ -74,22 +63,6 @@ jobs:
       contents: read
       actions: write
     timeout-minutes: 30
-    services:
-      postgres:
-        image: postgres:18-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: zayden
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/zayden
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup toolchain install stable --profile minimal
@@ -97,7 +70,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           cache-on-failure: true
-      - *fetch-tailwind
       - run: cargo test --workspace --all-targets --locked
       - uses: ./.github/actions/cancel-run
         if: failure()
@@ -111,52 +83,14 @@ jobs:
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
         with:
           command: check
-
-  sqlx:
-    name: sqlx prepare --check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write
-    timeout-minutes: 30
-    services:
-      postgres:
-        image: postgres:18-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: zayden
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      SQLX_OFFLINE: false
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/zayden
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup toolchain install stable --profile minimal
-      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
-        with:
-          save-if: ${{ github.ref == 'refs/heads/main' }}
-          cache-on-failure: true
-      - name: Install sqlx-cli
+      - name: One ref per org repository
         run: |
-          version="$(grep -A1 '^name = "sqlx"$' Cargo.lock | sed -n 's/^version = "\(.*\)"$/\1/p')"
-          test -n "$version"
-          cargo install "sqlx-cli@${version}" --locked --no-default-features \
-            --features postgres,rustls
-      - name: Apply migrations
-        run: sqlx migrate run --source schema/migrations
-      - *fetch-tailwind
-      - name: Check the offline cache is current
-        run: >-
-          cargo sqlx prepare --workspace --check -- --all-targets --locked
-      - uses: ./.github/actions/cancel-run
-        if: failure()
+          cargo metadata --format-version 1 --locked | jq -e '
+            [.packages[].source // empty
+              | select(test("github.com/[^/]+/(schema|platform|modules)([?#]|$)"))
+              | sub("#.*$"; "")]
+            | unique | group_by(sub("\\?.*$"; "")) | all(length == 1)'
 
   images:
     name: ${{ matrix.name }} image
@@ -170,14 +104,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: bot
+          - name: zayden
+            bin: zayden
             dockerfile: docker/Dockerfile.bot
             image: zayden-bot
             needs_ytdlp: true
-          - name: web
-            dockerfile: docker/Dockerfile.web
-            image: zayden-web
-            needs_ytdlp: false
 
     steps:
       - name: Checkout
@@ -237,7 +168,9 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           push: ${{ github.event_name != 'pull_request' }}
-          build-args: ${{ matrix.needs_ytdlp && format('YTDLP_VERSION={0}', steps.ytdlp.outputs.version) || '' }}
+          build-args: |
+            BIN=${{ matrix.bin }}
+            ${{ matrix.needs_ytdlp && format('YTDLP_VERSION={0}', steps.ytdlp.outputs.version) || '' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ steps.img.outputs.ref }}:buildcache

@@ -52,12 +52,6 @@ palworld_uploads/
 multipler-client-files/
 *.sav
 
-# Test fixtures must be committed despite the *.sav ignore above.
-!bot-modules/marathon/tests/fixtures/
-!bot-modules/marathon/tests/fixtures/**
-!bot-modules/palworld/tests/fixtures/
-!bot-modules/palworld/tests/fixtures/**
-
 # Python helper scripts
 __pycache__/
 .venv/
@@ -83,5 +77,5 @@ build/
 *.njsproj
 *.sln
 
-# Shared Topcoat reference
-docs/topcoat
+# Deployed config, symlinked from the infra checkout
+/config.toml
