@@ -107,7 +107,7 @@ jobs:
           - name: zayden
             bin: zayden
             dockerfile: docker/Dockerfile.bot
-            image: zayden-bot
+            image: zayden
             needs_ytdlp: true
 
     steps:
