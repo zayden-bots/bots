@@ -22,4 +22,5 @@ tokio = { workspace = true, features = ["macros"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
+schema = { workspace = true }
 tokio = { workspace = true, features = ["macros"] }

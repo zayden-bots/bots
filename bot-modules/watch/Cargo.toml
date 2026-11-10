@@ -32,4 +32,5 @@ tokio = { workspace = true, features = ["time", "rt", "sync"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
+schema = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }

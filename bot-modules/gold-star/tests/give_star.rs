@@ -80,7 +80,7 @@ macro_rules! row {
 /// comparison, dropping the `last_free_star = now()` bump (which would make the
 /// free star infinitely reusable — the DS-1 cap bypass), and debiting a star on
 /// the free arm.
-#[sqlx::test(migrations = "../../migrations", fixtures("gold_stars"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gold_stars"))]
 async fn free_star_is_free_and_closes_its_window(pool: PgPool) {
     let stars = GoldStarRow::give_star(
         &pool,
@@ -140,7 +140,7 @@ async fn free_star_is_free_and_closes_its_window(pool: PgPool) {
 /// balance change. Removing the SQL floor alone leaves every assertion here
 /// green; the floor earns its keep only if the lock is ever weakened. All three
 /// must go before this test fails — verified.
-#[sqlx::test(migrations = "../../migrations", fixtures("gold_stars"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gold_stars"))]
 async fn paid_gives_debit_one_each_and_stop_at_zero(pool: PgPool) {
     for expected_target_stars in 1..=2 {
         let stars =
@@ -176,7 +176,7 @@ async fn paid_gives_debit_one_each_and_stop_at_zero(pool: PgPool) {
 ///
 /// Catches: crediting the target before checking the author's balance, or
 /// committing the transaction on the error path.
-#[sqlx::test(migrations = "../../migrations", fixtures("gold_stars"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gold_stars"))]
 async fn a_refused_give_credits_nothing(pool: PgPool) {
     let err = GoldStarRow::give_star(&pool, EMPTY, "empty-author", TARGET, "target")
         .await
@@ -199,7 +199,7 @@ async fn a_refused_give_credits_nothing(pool: PgPool) {
 /// Catches: reverting the credit to an absolute write
 /// (`number_of_stars = EXCLUDED.number_of_stars`), under which both
 /// transactions write `1` and one star vanishes.
-#[sqlx::test(migrations = "../../migrations", fixtures("gold_stars"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gold_stars"))]
 async fn concurrent_gives_to_one_target_both_land(pool: PgPool) {
     let (first, second) = tokio::join!(
         GoldStarRow::give_star(&pool, PAID, "paid-author", TARGET, "target"),
@@ -238,7 +238,7 @@ async fn concurrent_gives_to_one_target_both_land(pool: PgPool) {
 /// which makes the `gold_stars` insert fail the `gold_stars.id REFERENCES
 /// users (id)` foreign key with SQLSTATE `23503` — surfaced to the member as an
 /// opaque `GoldStarError::Sqlx` with no user-facing message.
-#[sqlx::test(migrations = "../../migrations", fixtures("gold_stars"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gold_stars"))]
 async fn an_unseen_author_can_give(pool: PgPool) {
     let stars = GoldStarRow::give_star(
         &pool,
@@ -263,7 +263,7 @@ async fn an_unseen_author_can_give(pool: PgPool) {
 ///
 /// Catches: dropping the target's `INSERT INTO users … ON CONFLICT DO NOTHING`.
 /// The author here is seeded, so only the credit's foreign key is under test.
-#[sqlx::test(migrations = "../../migrations", fixtures("gold_stars"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gold_stars"))]
 async fn an_unseen_target_can_be_given_to(pool: PgPool) {
     let stars = GoldStarRow::give_star(
         &pool,

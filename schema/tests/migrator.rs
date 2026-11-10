@@ -1,8 +1,8 @@
 //! An older binary restarting against a database a newer binary has already
 //! migrated must start instead of failing on the unknown version.
 
+use schema::migrator;
 use sqlx::PgPool;
-use zayden_app::migrations::migrator;
 
 #[sqlx::test(migrations = false)]
 async fn a_version_applied_by_a_newer_binary_is_tolerated(pool: PgPool) {

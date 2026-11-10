@@ -38,7 +38,7 @@ const fn payment<'a>(
     }
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn a_claim_code_picks_the_server_out_of_several_on_the_same_rung(
     pool: PgPool,
 ) {
@@ -53,7 +53,7 @@ async fn a_claim_code_picks_the_server_out_of_several_on_the_same_rung(
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn without_a_claim_code_the_soonest_to_lapse_is_settled(pool: PgPool) {
     let service = entitlements(&pool);
     let paid = payment("msg-2", "Hosting £2.50", None);
@@ -67,7 +67,7 @@ async fn without_a_claim_code_the_soonest_to_lapse_is_settled(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn a_replayed_message_id_is_a_no_op(pool: PgPool) {
     let service = entitlements(&pool);
     let paid = payment("msg-3", "Hosting £2.50", Some("BCDFGH"));
@@ -86,7 +86,7 @@ async fn a_replayed_message_id_is_a_no_op(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn a_payment_settles_the_matching_rung_only(pool: PgPool) {
     let service = entitlements(&pool);
     let paid = payment("msg-4", "Hosting £2.50", None);
@@ -103,7 +103,7 @@ async fn a_payment_settles_the_matching_rung_only(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn a_claim_code_belonging_to_someone_else_is_ignored(pool: PgPool) {
     let service = entitlements(&pool);
     // YZ2345 is user 2's server; the payer is user 1.
@@ -121,7 +121,7 @@ async fn a_claim_code_belonging_to_someone_else_is_ignored(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn an_unlinked_email_is_recorded_but_unattributed(pool: PgPool) {
     let service = entitlements(&pool);
     let paid = Payment {
@@ -138,7 +138,7 @@ async fn an_unlinked_email_is_recorded_but_unattributed(pool: PgPool) {
     assert!(matches!(outcome, Some(Settlement::Unmatched(_))));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn an_off_ladder_amount_is_never_attributed(pool: PgPool) {
     let service = entitlements(&pool);
     let paid = Payment {
@@ -155,7 +155,7 @@ async fn an_off_ladder_amount_is_never_attributed(pool: PgPool) {
     assert!(matches!(outcome, Some(Settlement::Unmatched(_))));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("kofi"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("kofi"))]
 async fn settling_clears_the_suspension(pool: PgPool) {
     let service = entitlements(&pool);
     let paid = payment("msg-8", "Hosting £2.50", Some("BCDFGH"));

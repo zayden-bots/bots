@@ -2,7 +2,7 @@
 //! create first.
 //!
 //! `users.username` is `VARCHAR(255) NOT NULL` with no default
-//! ([`0001_v1_init.up.sql`]). `insert` used to seed the parent row with
+//! (`0001_v1_init.up.sql`). `insert` used to seed the parent row with
 //! `INSERT INTO users (id) VALUES ($1) ON CONFLICT (id) DO NOTHING`, which
 //! reads as safe but is not. Postgres validates `NOT NULL` while forming the
 //! candidate tuple, which happens *before* `ON CONFLICT` arbitration, so the
@@ -13,8 +13,6 @@
 //!
 //! These need a live Postgres — each `#[sqlx::test]` creates and drops its own
 //! migrated database, so `DATABASE_URL` must point at a throwaway server.
-//!
-//! [`0001_v1_init.up.sql`]: ../../../migrations/0001_v1_init.up.sql
 
 use jellyfin::JellyfinLinkRow;
 use serenity::all::UserId;
@@ -37,7 +35,7 @@ async fn username_of(
 
 /// Catches reverting the parent-row seed to `INSERT INTO users (id) VALUES ($1)`,
 /// which fails with `23502` for anyone who has no `users` row yet.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn links_a_user_who_has_no_users_row_yet(pool: PgPool) {
     assert_eq!(
         username_of(&pool, FIRST_TIME_LINKER).await.expect("users lookup failed"),
@@ -76,7 +74,7 @@ async fn links_a_user_who_has_no_users_row_yet(pool: PgPool) {
 
 /// The parent seed is `ON CONFLICT DO NOTHING`, so a `users` row another module
 /// already owns keeps its username — linking Jellyfin must not rename anyone.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn keeps_the_username_an_existing_users_row_already_has(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO users (id, username) VALUES ($1, $2)",

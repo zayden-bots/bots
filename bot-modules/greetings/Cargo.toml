@@ -25,5 +25,6 @@ sqlx = { workspace = true, features = ["migrate"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
+schema = { workspace = true }
 serde_json = { workspace = true, features = ["std"] }
 tokio = { workspace = true, features = ["macros"] }

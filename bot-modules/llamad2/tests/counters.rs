@@ -39,13 +39,11 @@
 use llamad2::Counter;
 use sqlx::PgPool;
 
-const MIGRATIONS: &str = "../../migrations";
-
 /// A counter that does not exist yet starts at `1`, not `0` and not an error.
 ///
 /// This is the empty-file bug the DB move fixed: the first-ever counting fail
 /// on a fresh deploy used to hit `serde_json::from_str("")` and be dropped.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn bump_creates_a_missing_counter_at_one(pool: PgPool) {
     let count = Counter::bump(&pool, Counter::COUNTING_FAILS)
         .await
@@ -56,7 +54,7 @@ async fn bump_creates_a_missing_counter_at_one(pool: PgPool) {
 
 /// Each bump returns the post-increment value, and the two counters do not
 /// share a row.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn bump_increments_and_returns_the_new_value(pool: PgPool) {
     for expected in 1..=3 {
         let count = Counter::bump(&pool, Counter::COUNTING_FAILS)
@@ -83,7 +81,7 @@ async fn bump_increments_and_returns_the_new_value(pool: PgPool) {
 /// read-modify-write lost one of any two concurrent fails. Catches reverting
 /// the upsert to an absolute write (`SET count = EXCLUDED.count`), under which
 /// both callers observe `1` and the counter ends at `1` instead of `2`.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn bumps_are_atomic_under_concurrency(pool: PgPool) {
     let (first, second) = tokio::join!(
         Counter::bump(&pool, Counter::COUNTING_FAILS),
@@ -121,17 +119,12 @@ fn counter_names_are_the_persisted_ones() {
     assert_eq!(Counter::DUMB_COUNT, "dumb_count");
 }
 
-/// Guards the migration path the tests load, so a directory move fails here
+/// Guards the migration the tests rely on, so a missing one fails here
 /// rather than as an opaque "relation does not exist" in every test above.
 #[test]
-fn migrations_are_where_the_tests_look() {
+fn the_counters_migration_is_embedded() {
     assert!(
-        std::path::Path::new(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../migrations"
-        ))
-        .join("0016_llamad2_counters.up.sql")
-        .exists(),
-        "missing {MIGRATIONS}/0016_llamad2_counters.up.sql"
+        schema::MIGRATOR.version_exists(16),
+        "schema::MIGRATOR is missing 0016_llamad2_counters"
     );
 }

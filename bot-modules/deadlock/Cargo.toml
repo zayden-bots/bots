@@ -31,5 +31,6 @@ tokio = { workspace = true, features = ["rt", "time"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
+schema = { workspace = true }
 sqlx = { workspace = true, features = ["migrate"] }
 tokio = { workspace = true, features = ["macros", "rt", "net", "io-util"] }

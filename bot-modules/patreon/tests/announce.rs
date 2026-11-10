@@ -31,7 +31,7 @@ fn post(id: &str, campaign: &str, is_public: bool) -> PatreonPost {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn the_claim_takes_only_unannounced_posts(pool: PgPool) {
     let claimed = claim_pending(&pool, 10).await.unwrap();
 
@@ -39,13 +39,13 @@ async fn the_claim_takes_only_unannounced_posts(pool: PgPool) {
     assert_eq!(ids, ["p-public", "p-patrons"]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_claimed_post_is_not_claimed_again(pool: PgPool) {
     assert_eq!(claim_pending(&pool, 10).await.unwrap().len(), 2);
     assert!(claim_pending(&pool, 10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn the_claim_respects_its_batch_limit(pool: PgPool) {
     assert_eq!(claim_pending(&pool, 1).await.unwrap().len(), 1);
     assert_eq!(claim_pending(&pool, 1).await.unwrap().len(), 1);
@@ -54,7 +54,7 @@ async fn the_claim_respects_its_batch_limit(pool: PgPool) {
 
 /// One creator, two servers: both get the public post, only the guild that
 /// asked for everything gets the patrons-only one.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_public_only_guild_is_skipped_for_a_patrons_post(pool: PgPool) {
     let mut public: Vec<i64> = PatreonAnnounceRow::for_post(&pool, "100", true)
         .await
@@ -78,7 +78,7 @@ async fn a_public_only_guild_is_skipped_for_a_patrons_post(pool: PgPool) {
 /// The whole multi-tenant guarantee in one assertion: a guild reaches a
 /// campaign only through its own grant, so campaign 100's posts can never land
 /// in a server connected to campaign 300.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_guild_never_receives_a_campaign_it_did_not_authorise(pool: PgPool) {
     let recipients = PatreonAnnounceRow::for_post(&pool, "100", true).await.unwrap();
 
@@ -89,14 +89,14 @@ async fn a_guild_never_receives_a_campaign_it_did_not_authorise(pool: PgPool) {
 }
 
 /// A revoked grant stops delivery without anyone having to remove the channel.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_disabled_connection_receives_nothing(pool: PgPool) {
     let recipients = PatreonAnnounceRow::for_post(&pool, "400", true).await.unwrap();
 
     assert!(recipients.is_empty(), "{recipients:?}");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn only_connected_campaigns_with_a_channel_are_polled(pool: PgPool) {
     let pollable = PatreonConnection::pollable(&pool).await.unwrap();
 
@@ -108,7 +108,7 @@ async fn only_connected_campaigns_with_a_channel_are_polled(pool: PgPool) {
 
 /// Two guilds on one creator share a cursor, so the campaign is fetched once
 /// per pass rather than once per guild.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_shared_campaign_is_polled_once(pool: PgPool) {
     let pollable = PatreonConnection::pollable(&pool).await.unwrap();
 
@@ -116,7 +116,7 @@ async fn a_shared_campaign_is_polled_once(pool: PgPool) {
     assert_eq!(pollable.first().map(|c| c.guild_id), Some(1));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn subscription_gates_the_webhook(pool: PgPool) {
     assert!(is_subscribed(&pool, "100").await.unwrap());
     assert!(!is_subscribed(&pool, "300").await.unwrap(), "no channel");
@@ -126,7 +126,7 @@ async fn subscription_gates_the_webhook(pool: PgPool) {
 
 /// Each guild registers its own hook, so a campaign can have several secrets
 /// and an inbound delivery has to be checked against all of them.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn every_live_secret_for_a_campaign_is_returned(pool: PgPool) {
     let mut secrets = webhook_secrets(&pool, "100").await.unwrap();
     secrets.sort();
@@ -140,7 +140,7 @@ async fn every_live_secret_for_a_campaign_is_returned(pool: PgPool) {
 
 /// The same post arriving from both the poll and the webhook must not produce
 /// two rows, and therefore not two announcements.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn inserting_a_post_twice_is_a_no_op(pool: PgPool) {
     let post = post("p-new", "100", true);
 
@@ -153,7 +153,7 @@ async fn inserting_a_post_twice_is_a_no_op(pool: PgPool) {
 
 /// Seeding is what stops connecting a campaign from replaying its entire back
 /// catalogue into the channel.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_post_inserted_as_announced_is_never_claimed(pool: PgPool) {
     assert!(insert_post(&pool, &post("p-seeded", "100", true), true).await.unwrap());
 
@@ -161,7 +161,7 @@ async fn a_post_inserted_as_announced_is_never_claimed(pool: PgPool) {
     assert!(claimed.iter().all(|p| p.post_id != "p-seeded"), "{claimed:?}");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_poll_that_reaches_the_last_page_advances_the_cursor_and_seeds(
     pool: PgPool,
 ) {
@@ -177,7 +177,7 @@ async fn a_poll_that_reaches_the_last_page_advances_the_cursor_and_seeds(
 
 /// A back catalogue deeper than one poll's page budget is absorbed over
 /// several polls; seeding after the first would announce the rest of it.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_poll_cut_short_by_the_page_budget_does_not_seed(pool: PgPool) {
     PatreonCampaignRow::ensure(&pool, "300").await.unwrap();
     PatreonCampaignRow::record_success(&pool, "300", Some("cursor-25"), false)
@@ -191,7 +191,7 @@ async fn a_poll_cut_short_by_the_page_budget_does_not_seed(pool: PgPool) {
 
 /// `seeded_at` is the boundary between absorbing and announcing, so a later
 /// poll must not move it.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_later_poll_does_not_reseed(pool: PgPool) {
     let before = campaign(&pool, "100").await.seeded_at;
 
@@ -202,7 +202,7 @@ async fn a_later_poll_does_not_reseed(pool: PgPool) {
     assert_eq!(campaign(&pool, "100").await.seeded_at, before);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn failures_accumulate_and_a_success_clears_them(pool: PgPool) {
     assert_eq!(PatreonCampaignRow::record_failure(&pool, "100").await.unwrap(), 1);
     assert_eq!(PatreonCampaignRow::record_failure(&pool, "100").await.unwrap(), 2);
@@ -212,7 +212,7 @@ async fn failures_accumulate_and_a_success_clears_them(pool: PgPool) {
     assert_eq!(campaign(&pool, "100").await.consecutive_failures, 0);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn setting_a_channel_does_not_touch_the_connection(pool: PgPool) {
     PatreonAnnounceRow::upsert(&pool, 1, 9999, true, None).await.unwrap();
 
@@ -224,7 +224,7 @@ async fn setting_a_channel_does_not_touch_the_connection(pool: PgPool) {
     assert_eq!(connection.campaign_id, "100");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn disable_reports_whether_anything_was_removed(pool: PgPool) {
     assert!(PatreonAnnounceRow::delete(&pool, 1).await.unwrap());
     assert!(!PatreonAnnounceRow::delete(&pool, 1).await.unwrap());
@@ -232,7 +232,7 @@ async fn disable_reports_whether_anything_was_removed(pool: PgPool) {
 
 /// Disconnecting removes the grant, which takes the guild out of every path at
 /// once: no poll, no webhook, no announcement.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn deleting_a_connection_unsubscribes_the_guild(pool: PgPool) {
     assert_eq!(
         PatreonConnection::delete(&pool, 2).await.unwrap().as_deref(),
@@ -245,7 +245,7 @@ async fn deleting_a_connection_unsubscribes_the_guild(pool: PgPool) {
     assert_eq!(webhook_secrets(&pool, "100").await.unwrap(), ["secret-1"]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn a_campaign_with_a_connection_is_not_forgotten(pool: PgPool) {
     PatreonConnection::delete(&pool, 2).await.unwrap();
 
@@ -255,7 +255,7 @@ async fn a_campaign_with_a_connection_is_not_forgotten(pool: PgPool) {
 
 /// The cached posts only exist to be announced, so they go with the last
 /// connection; the guild's announcement settings stay.
-#[sqlx::test(migrations = "../../migrations", fixtures("patreon"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("patreon"))]
 async fn the_last_disconnect_forgets_the_campaign_and_its_posts(pool: PgPool) {
     PatreonConnection::delete(&pool, 1).await.unwrap();
     PatreonConnection::delete(&pool, 2).await.unwrap();

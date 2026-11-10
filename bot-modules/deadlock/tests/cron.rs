@@ -5,7 +5,7 @@ use deadlock::cron::{DeadlockMatchCron, DeadlockPatchCron};
 use deadlock_api::DeadlockClient;
 use sqlx::PgPool;
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn schedule_expression_parses(pool: PgPool) {
     let client = DeadlockClient::builder().build().unwrap();
     let api = Arc::new(DeadlockApi::from_client(client, pool));
@@ -15,7 +15,7 @@ async fn schedule_expression_parses(pool: PgPool) {
     assert!(job.is_ok(), "cron schedule failed to parse: {:?}", job.err());
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn match_poll_schedule_expression_parses(pool: PgPool) {
     let client = DeadlockClient::builder().build().unwrap();
     let api = Arc::new(DeadlockApi::from_client(client, pool));

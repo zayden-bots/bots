@@ -152,8 +152,12 @@ fn clamping_caps_at_the_column_constraint() {
 /// cooldown silently changes the first time any greetings setting is saved.
 #[test]
 fn the_column_defaults_match_the_free_floor() {
-    let migration =
-        include_str!("../../../migrations/0026_greetings_cooldowns.up.sql");
+    let migration = schema::MIGRATOR
+        .iter()
+        .find(|m| m.version == 26 && m.migration_type.is_up_migration())
+        .expect("migration 0026 is embedded")
+        .sql
+        .as_str();
     let free = GreetingsSettingsRow::FREE_FLOORS;
 
     assert!(

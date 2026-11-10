@@ -80,7 +80,7 @@ async fn configure(
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn configured_role_is_returned_per_guild(pool: PgPool) {
     let store = store(pool.clone());
 
@@ -94,7 +94,7 @@ async fn configured_role_is_returned_per_guild(pool: PgPool) {
     assert_eq!(b, ROLE_B);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn unconfigured_guild_reports_not_configured(pool: PgPool) {
     let store = store(pool.clone());
 
@@ -111,7 +111,7 @@ async fn unconfigured_guild_reports_not_configured(pool: PgPool) {
 /// A guild with no `roles_settings` row at all — `SettingsStore::get` falls back
 /// to `RolesSettingsRow::empty`, which must also read as "not configured" rather
 /// than panicking or defaulting to some other guild's role.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn missing_settings_row_reports_not_configured(pool: PgPool) {
     let store = store(pool);
 
@@ -127,7 +127,7 @@ async fn missing_settings_row_reports_not_configured(pool: PgPool) {
 /// `add_role` against a foreign role id, which
 /// [`Respond::user_message`] maps to `None` — a generic failure with no
 /// indication of what is wrong.
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn not_configured_has_a_user_message(pool: PgPool) {
     use zayden_core::error::Respond;
 

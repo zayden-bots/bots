@@ -3,7 +3,7 @@ use sqlx::PgPool;
 
 const ZAYDEN: i64 = 1000;
 
-#[sqlx::test(migrations = "../../migrations", fixtures("announce_targets"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("announce_targets"))]
 async fn targets_exclude_disabled_absent_and_custom_served_guilds(pool: PgPool) {
     let rows = targets(&pool, ZAYDEN).await.unwrap();
 
@@ -13,7 +13,7 @@ async fn targets_exclude_disabled_absent_and_custom_served_guilds(pool: PgPool) 
     assert_eq!(guilds, vec![1, 2]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("announce_targets"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("announce_targets"))]
 async fn another_application_only_sees_the_guilds_it_is_in(pool: PgPool) {
     let rows = targets(&pool, 3000).await.unwrap();
 

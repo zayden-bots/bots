@@ -84,7 +84,7 @@ macro_rules! state {
     };
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn the_first_run_seeds_state_and_stores_existing_notes_as_announced(
     pool: PgPool,
 ) {
@@ -104,7 +104,7 @@ async fn the_first_run_seeds_state_and_stores_existing_notes_as_announced(
     assert_eq!(fetched(&mock, "client_version=2"), 2);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_new_client_version_alone_stores_a_snapshot_and_moves_only_latest(
     pool: PgPool,
 ) {
@@ -128,7 +128,7 @@ async fn a_new_client_version_alone_stores_a_snapshot_and_moves_only_latest(
     assert_eq!(fetched(&mock, "client_version=2"), 2);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_new_note_after_a_version_bump_is_diffed_against_the_baseline(
     pool: PgPool,
 ) {
@@ -160,7 +160,7 @@ async fn a_new_note_after_a_version_bump_is_diffed_against_the_baseline(
     assert_eq!(diff.hero_ids(), vec![1]);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_note_without_a_version_bump_waits_for_the_build_then_gets_an_empty_diff(
     pool: PgPool,
 ) {
@@ -189,7 +189,7 @@ async fn a_note_without_a_version_bump_waits_for_the_build_then_gets_an_empty_di
     assert!(patch.diff.as_ref().unwrap().is_empty());
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn an_old_note_is_stored_announced_and_other_sources_are_ignored(
     pool: PgPool,
 ) {

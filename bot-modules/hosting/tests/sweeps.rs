@@ -15,7 +15,7 @@ fn ids(rows: Result<Vec<sweep::Claimed>, hosting::HostingError>) -> Vec<i64> {
     ids
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn expiry_claims_only_priced_rows_past_their_window(pool: PgPool) {
     let claimed = ids(sweep::claim_expired(&pool, 3, 40).await);
 
@@ -26,7 +26,7 @@ async fn expiry_claims_only_priced_rows_past_their_window(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn expiry_leaves_included_plans_for_the_conversion_sweep(pool: PgPool) {
     let claimed = ids(sweep::claim_expired(&pool, 3, 40).await);
 
@@ -36,7 +36,7 @@ async fn expiry_leaves_included_plans_for_the_conversion_sweep(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn expiry_is_idempotent_across_passes(pool: PgPool) {
     let first = ids(sweep::claim_expired(&pool, 3, 40).await);
     let second = ids(sweep::claim_expired(&pool, 3, 40).await);
@@ -45,7 +45,7 @@ async fn expiry_is_idempotent_across_passes(pool: PgPool) {
     assert!(second.is_empty(), "a claimed row must not be claimed twice");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn expiry_sets_the_grace_clock(pool: PgPool) {
     sweep::claim_expired(&pool, 3, 40).await.ok();
 
@@ -55,7 +55,7 @@ async fn expiry_sets_the_grace_clock(pool: PgPool) {
     assert_eq!(state.as_deref(), Some("suspended"));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn finished_included_trials_convert_rather_than_suspend(pool: PgPool) {
     let claimed = ids(sweep::convert_included_trials(&pool, 40).await);
 
@@ -69,14 +69,14 @@ async fn finished_included_trials_convert_rather_than_suspend(pool: PgPool) {
     assert_eq!(billing.as_deref(), Some("entitlement"));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn deletion_claims_only_rows_past_their_grace(pool: PgPool) {
     let claimed = ids(sweep::claim_deletions(&pool, 40).await);
 
     assert_eq!(claimed, vec![5]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn a_claimed_deletion_leases_rather_than_releases(pool: PgPool) {
     let first = ids(sweep::claim_deletions(&pool, 40).await);
     let second = ids(sweep::claim_deletions(&pool, 40).await);
@@ -88,7 +88,7 @@ async fn a_claimed_deletion_leases_rather_than_releases(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn reminders_fire_once_per_window(pool: PgPool) {
     let first = ids(sweep::claim_reminders(&pool, 2, 40).await);
     let second = ids(sweep::claim_reminders(&pool, 2, 40).await);
@@ -97,7 +97,7 @@ async fn reminders_fire_once_per_window(pool: PgPool) {
     assert!(second.is_empty(), "a reminder must never be sent twice");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn trials_never_get_an_expiry_reminder(pool: PgPool) {
     // Row 11's trial ends in an hour, well inside a two-day reminder window.
     // Reminders are a subscription courtesy; firing one here would DM the owner
@@ -107,7 +107,7 @@ async fn trials_never_get_an_expiry_reminder(pool: PgPool) {
     assert!(!claimed.contains(&11), "a trial has no renewal to be reminded of");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn a_lapsed_trial_gets_no_grace_but_a_lapsed_subscription_does(pool: PgPool) {
     let expired = ids(sweep::claim_expired(&pool, 3, 40).await);
     assert_eq!(expired, vec![1, 2], "row 1 is a subscription, row 2 a trial");
@@ -125,14 +125,14 @@ async fn a_lapsed_trial_gets_no_grace_but_a_lapsed_subscription_does(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn revalidation_sees_only_subscription_billed_rows(pool: PgPool) {
     let rows = ids(sweep::entitlement_backed(&pool, 40).await);
 
     assert_eq!(rows, vec![9]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn deleted_rows_are_invisible_to_every_sweep(pool: PgPool) {
     let expired = ids(sweep::claim_expired(&pool, 3, 40).await);
     let deletions = ids(sweep::claim_deletions(&pool, 40).await);
@@ -144,7 +144,7 @@ async fn deleted_rows_are_invisible_to_every_sweep(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn the_per_user_cap_counts_live_rows_only(pool: PgPool) {
     let owner = serenity::all::UserId::new(3);
     let count = store::live_count(&pool, owner).await.ok();
@@ -153,7 +153,7 @@ async fn the_per_user_cap_counts_live_rows_only(pool: PgPool) {
     assert_eq!(count, Some(3));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn global_usage_excludes_deleted_memory(pool: PgPool) {
     let usage = store::global_usage(&pool).await.ok();
     let (servers, _memory) = usage.unwrap_or((0, 0));
@@ -165,7 +165,7 @@ fn next_month() -> jiff::Timestamp {
     jiff::Timestamp::now() + jiff::SignedDuration::from_hours(24 * 30)
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn paying_for_a_suspended_server_queues_its_unsuspend(pool: PgPool) {
     store::record_payment(&pool, 6, next_month()).await.unwrap();
 
@@ -179,7 +179,7 @@ async fn paying_for_a_suspended_server_queues_its_unsuspend(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn paying_for_a_running_server_queues_nothing(pool: PgPool) {
     store::record_payment(&pool, 4, next_month()).await.unwrap();
 
@@ -188,7 +188,7 @@ async fn paying_for_a_running_server_queues_nothing(pool: PgPool) {
     assert!(claimed.is_empty(), "row 4 was never suspended on the panel");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn a_failed_unsuspend_retries_until_cleared(pool: PgPool) {
     store::record_payment(&pool, 6, next_month()).await.unwrap();
     assert_eq!(ids(sweep::claim_unsuspends(&pool, 40).await), vec![6]);
@@ -223,7 +223,7 @@ async fn a_failed_unsuspend_retries_until_cleared(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("hosting"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("hosting"))]
 async fn a_server_suspended_again_is_not_unsuspended(pool: PgPool) {
     store::record_payment(&pool, 6, next_month()).await.unwrap();
     sweep::suspend(&pool, 6, 3).await.unwrap();

@@ -25,7 +25,7 @@ macro_rules! list {
     };
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn list_returns_only_the_requested_guild_and_kind(pool: PgPool) {
     let morning = list!(pool, GUILD, GreetingKind::Morning);
     let urls: Vec<_> = morning.iter().map(|i| i.url.as_str()).collect();
@@ -51,7 +51,7 @@ async fn list_returns_only_the_requested_guild_and_kind(pool: PgPool) {
 /// `add` seeds `guilds` itself, so a server that has never had any other
 /// setting written still accepts its first image instead of failing with a
 /// foreign-key violation.
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn add_seeds_a_guild_that_does_not_exist_yet(pool: PgPool) {
     let row = GreetingImage::add(
         &pool,
@@ -69,7 +69,7 @@ async fn add_seeds_a_guild_that_does_not_exist_yet(pool: PgPool) {
     assert_eq!(images.len(), 1);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn add_rejects_an_invalid_url_before_touching_the_database(pool: PgPool) {
     let err = GreetingImage::add(
         &pool,
@@ -88,7 +88,7 @@ async fn add_rejects_an_invalid_url_before_touching_the_database(pool: PgPool) {
 /// The unique constraint is on `(guild_id, kind, url)`, so the same link may
 /// appear in both the morning and night lists, and in another guild, but not
 /// twice in one list.
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn duplicates_are_rejected_per_guild_and_kind(pool: PgPool) {
     let url = "https://example.com/sunrise-1.gif";
 
@@ -108,7 +108,7 @@ async fn duplicates_are_rejected_per_guild_and_kind(pool: PgPool) {
 
 /// A failed duplicate add rolls its transaction back, so the `guilds` seed and
 /// the count check it performed leave nothing behind.
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn a_rejected_add_leaves_the_list_unchanged(pool: PgPool) {
     let before = list!(pool, GUILD, GreetingKind::Morning);
 
@@ -125,7 +125,7 @@ async fn a_rejected_add_leaves_the_list_unchanged(pool: PgPool) {
     assert_eq!(before.len(), after.len());
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn the_cap_is_per_guild_and_per_kind(pool: PgPool) {
     let max = GreetingImage::MAX_PER_KIND;
 
@@ -177,7 +177,7 @@ async fn the_cap_is_per_guild_and_per_kind(pool: PgPool) {
     .expect("another guild has its own budget");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn remove_deletes_one_row_and_reports_it(pool: PgPool) {
     let images = list!(pool, GUILD, GreetingKind::Morning);
     let target = images.first().expect("fixture seeds two");
@@ -197,7 +197,7 @@ async fn remove_deletes_one_row_and_reports_it(pool: PgPool) {
 
 /// `remove` is scoped by `guild_id` as well as `id`. Without that, an admin of
 /// any guild could delete another guild's images by guessing sequential ids.
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn remove_cannot_reach_another_guilds_row(pool: PgPool) {
     let victim = list!(pool, OTHER_GUILD, GreetingKind::Morning);
     let victim = victim.first().expect("fixture seeds one");
@@ -212,7 +212,7 @@ async fn remove_cannot_reach_another_guilds_row(pool: PgPool) {
 
 /// `ON DELETE CASCADE` means removing Zayden from a server takes its curated
 /// lists with it rather than orphaning rows.
-#[sqlx::test(migrations = "../../migrations", fixtures("greetings"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("greetings"))]
 async fn images_cascade_when_the_guild_is_deleted(pool: PgPool) {
     sqlx::query("DELETE FROM guilds WHERE id = $1")
         .bind(i64::from(GUILD))

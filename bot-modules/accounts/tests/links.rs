@@ -5,7 +5,7 @@ use sqlx::PgPool;
 const FIRST_ID: &str = "76561197960287930";
 const SECOND_ID: &str = "76561197960287931";
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn an_upserted_link_can_be_selected(pool: PgPool) {
     AccountLink::upsert_transfer(&pool, 1, Provider::Steam, FIRST_ID).await.unwrap();
 
@@ -19,7 +19,7 @@ async fn an_upserted_link_can_be_selected(pool: PgPool) {
     assert!(AccountLink::select(&pool, 2, Provider::Steam).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn relinking_replaces_the_external_id(pool: PgPool) {
     AccountLink::upsert_transfer(&pool, 1, Provider::Steam, FIRST_ID).await.unwrap();
     AccountLink::upsert_transfer(&pool, 1, Provider::Steam, SECOND_ID)
@@ -32,7 +32,7 @@ async fn relinking_replaces_the_external_id(pool: PgPool) {
     assert_eq!(links.first().unwrap().external_id, SECOND_ID);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn linking_an_account_already_linked_elsewhere_transfers_it(pool: PgPool) {
     AccountLink::upsert_transfer(&pool, 1, Provider::Steam, FIRST_ID).await.unwrap();
     AccountLink::upsert_transfer(&pool, 2, Provider::Steam, FIRST_ID).await.unwrap();
@@ -43,7 +43,7 @@ async fn linking_an_account_already_linked_elsewhere_transfers_it(pool: PgPool) 
     assert_eq!(link.external_id, FIRST_ID);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn delete_reports_whether_a_link_existed(pool: PgPool) {
     AccountLink::upsert_transfer(&pool, 1, Provider::Steam, FIRST_ID).await.unwrap();
 
@@ -52,7 +52,7 @@ async fn delete_reports_whether_a_link_existed(pool: PgPool) {
     assert!(AccountLink::select(&pool, 1, Provider::Steam).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn listing_returns_only_the_users_links(pool: PgPool) {
     AccountLink::upsert_transfer(&pool, 1, Provider::Steam, FIRST_ID).await.unwrap();
     AccountLink::upsert_transfer(&pool, 2, Provider::Steam, SECOND_ID)

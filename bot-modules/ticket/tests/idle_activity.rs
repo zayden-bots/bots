@@ -38,20 +38,20 @@ async fn claimed(pool: &PgPool) -> Vec<i64> {
     ids
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn only_stalled_threads_in_enabled_guilds_come_due(pool: PgPool) {
     assert_eq!(claimed(&pool).await, vec![10, 11, 12]);
 }
 
 /// The claim and the read are one statement, so a second sweeper - or a second
 /// tick before the first finished - finds nothing left to ping.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_claimed_thread_is_not_claimed_twice(pool: PgPool) {
     assert_eq!(claimed(&pool).await.len(), 3);
     assert_eq!(claimed(&pool).await, Vec::<i64>::new());
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn the_sweep_reports_the_ball_and_the_roles(pool: PgPool) {
     let due = claim_due(&pool, 40).await.expect("sweep");
 
@@ -65,7 +65,7 @@ async fn the_sweep_reports_the_ball_and_the_roles(pool: PgPool) {
     assert_eq!(waiting_on_op.helper(), Some(HELPER));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_helper_reply_moves_the_ball_to_the_poster(pool: PgPool) {
     ThreadActivity::track(&pool, thread(10), HELPER, &[SUPPORT], false)
         .await
@@ -81,7 +81,7 @@ async fn a_helper_reply_moves_the_ball_to_the_poster(pool: PgPool) {
     assert!(claimed(&pool).await.iter().all(|id| *id != 10));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_poster_reply_moves_the_ball_back_to_the_helpers(pool: PgPool) {
     ThreadActivity::track(&pool, thread(11), OP, &[], false).await.expect("track");
 
@@ -96,7 +96,7 @@ async fn a_poster_reply_moves_the_ball_back_to_the_helpers(pool: PgPool) {
 
 /// The regression the SQL `WHERE` tail exists for: anyone can post in a public
 /// forum ticket, and a passer-by is neither side of the conversation.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_bystander_does_not_move_the_ball(pool: PgPool) {
     ThreadActivity::track(&pool, thread(10), BYSTANDER, &[UNRELATED], false)
         .await
@@ -106,7 +106,7 @@ async fn a_bystander_does_not_move_the_ball(pool: PgPool) {
 }
 
 /// Owners often help out without holding the support role themselves.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn the_guild_owner_counts_as_a_helper(pool: PgPool) {
     ThreadActivity::track(&pool, thread(10), OWNER, &[], false)
         .await
@@ -122,7 +122,7 @@ async fn the_guild_owner_counts_as_a_helper(pool: PgPool) {
 }
 
 /// A helper bot answers the ticket, but it is never the one to nudge later.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_support_bot_moves_the_ball_without_becoming_the_helper(pool: PgPool) {
     ThreadActivity::track(&pool, thread(10), HELPER_BOT, &[SUPPORT], true)
         .await
@@ -146,7 +146,7 @@ async fn a_support_bot_moves_the_ball_without_becoming_the_helper(pool: PgPool) 
     assert_eq!(helped.helper_id, Some(2000));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_bot_without_a_support_role_does_not_move_the_ball(pool: PgPool) {
     ThreadActivity::track(&pool, thread(10), HELPER_BOT, &[UNRELATED], true)
         .await
@@ -157,7 +157,7 @@ async fn a_bot_without_a_support_role_does_not_move_the_ball(pool: PgPool) {
 
 /// A staff member's own ticket. The `op_id` test wins over the role test, so
 /// they are never nudged to answer themselves.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn the_poster_holding_a_support_role_is_still_the_poster(pool: PgPool) {
     ThreadActivity::track(&pool, thread(10), OP, &[SUPPORT], false)
         .await
@@ -172,7 +172,7 @@ async fn the_poster_holding_a_support_role_is_still_the_poster(pool: PgPool) {
     assert_eq!(row.helper_id, None);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn the_poster_does_not_overwrite_the_helper(pool: PgPool) {
     ThreadActivity::track(&pool, thread(12), OP, &[], false).await.expect("track");
 
@@ -185,7 +185,7 @@ async fn the_poster_does_not_overwrite_the_helper(pool: PgPool) {
 }
 
 /// A reply re-arms a thread that has already had its one nudge.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_reply_clears_a_spent_nudge(pool: PgPool) {
     assert!(!claimed(&pool).await.contains(&14));
 
@@ -199,7 +199,7 @@ async fn a_reply_clears_a_spent_nudge(pool: PgPool) {
 
 /// A solved or closed ticket reads as absent, which is what makes the buttons
 /// refuse a second press.
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn a_paused_thread_is_not_active_and_ignores_replies(pool: PgPool) {
     assert!(
         ThreadActivity::active(&pool, thread(15)).await.expect("active").is_none()
@@ -214,7 +214,7 @@ async fn a_paused_thread_is_not_active_and_ignores_replies(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn pausing_and_resuming_survives_the_helper(pool: PgPool) {
     ThreadActivity::pause(&pool, thread(12)).await.expect("pause");
     assert!(
@@ -234,7 +234,7 @@ async fn pausing_and_resuming_survives_the_helper(pool: PgPool) {
     assert!(!claimed(&pool).await.contains(&12));
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("support_idle"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("support_idle"))]
 async fn insert_is_idempotent_and_delete_is_final(pool: PgPool) {
     ThreadActivity::insert(&pool, GUILD, thread(30), OP).await.expect("insert");
     ThreadActivity::insert(&pool, GUILD, thread(30), BYSTANDER)

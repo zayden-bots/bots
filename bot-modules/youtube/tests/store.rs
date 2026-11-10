@@ -31,7 +31,7 @@ fn channel(id: &str) -> OwnChannel {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn the_claim_takes_only_unannounced_videos_oldest_first(pool: PgPool) {
     let claimed = claim_pending(&pool, 10).await.unwrap();
 
@@ -40,13 +40,13 @@ async fn the_claim_takes_only_unannounced_videos_oldest_first(pool: PgPool) {
     assert_eq!(claimed[0].channel_title, "Shared Creator");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_claimed_video_is_not_claimed_again(pool: PgPool) {
     assert_eq!(claim_pending(&pool, 10).await.unwrap().len(), 2);
     assert!(claim_pending(&pool, 10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_video_inserted_as_announced_is_never_claimed(pool: PgPool) {
     assert!(insert_video(&pool, &video("v-seeded", "UCother"), true).await.unwrap());
 
@@ -54,7 +54,7 @@ async fn a_video_inserted_as_announced_is_never_claimed(pool: PgPool) {
     assert!(claimed.iter().all(|v| v.video_id != "v-seeded"), "{claimed:?}");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_video_is_stored_once(pool: PgPool) {
     assert!(insert_video(&pool, &video("v-new", "UCother"), false).await.unwrap());
     assert!(!insert_video(&pool, &video("v-new", "UCother"), false).await.unwrap());
@@ -62,7 +62,7 @@ async fn a_video_is_stored_once(pool: PgPool) {
 
 /// Guild 2 shares the channel but has no announce channel, so only guild 1
 /// hears about it; guild 3 follows another channel entirely.
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_video_reaches_only_guilds_following_its_channel(pool: PgPool) {
     let shared: Vec<i64> = YoutubeAnnounceRow::for_channel(&pool, "UCshared")
         .await
@@ -81,7 +81,7 @@ async fn a_video_reaches_only_guilds_following_its_channel(pool: PgPool) {
     assert_eq!(other, [3]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn only_channels_with_an_announcing_guild_are_polled(pool: PgPool) {
     let polled: Vec<String> = YoutubeChannelRow::pollable(&pool)
         .await
@@ -97,7 +97,7 @@ async fn only_channels_with_an_announcing_guild_are_polled(pool: PgPool) {
 
 /// `UCshared`'s lease has days left and `UCorphan` has no connection to renew
 /// for.
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn only_leases_near_expiry_on_connected_channels_are_renewed(pool: PgPool) {
     let due: Vec<String> = YoutubeChannelRow::lease_due(&pool)
         .await
@@ -109,7 +109,7 @@ async fn only_leases_near_expiry_on_connected_channels_are_renewed(pool: PgPool)
     assert_eq!(due, ["UCother"]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_second_guild_on_a_channel_reuses_its_hub_secret(pool: PgPool) {
     sqlx::query!("INSERT INTO guilds (id) VALUES (4)").execute(&pool).await.unwrap();
 
@@ -141,7 +141,7 @@ async fn a_second_guild_on_a_channel_reuses_its_hub_secret(pool: PgPool) {
     assert!(connection.lease_active);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn the_hub_subscription_outlives_all_but_the_last_guild(pool: PgPool) {
     assert_eq!(
         YoutubeConnection::delete(&pool, 1).await.unwrap().as_deref(),
@@ -161,7 +161,7 @@ async fn the_hub_subscription_outlives_all_but_the_last_guild(pool: PgPool) {
     assert_eq!(YoutubeConnection::delete(&pool, 2).await.unwrap(), None);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn seeding_happens_once(pool: PgPool) {
     YoutubeChannelRow::record_success(&pool, "UCother").await.unwrap();
     let first = YoutubeChannelRow::select(&pool, "UCother").await.unwrap().unwrap();
@@ -172,7 +172,7 @@ async fn seeding_happens_once(pool: PgPool) {
     assert_eq!(first.seeded_at, second.seeded_at);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn failures_accumulate_and_a_success_clears_them(pool: PgPool) {
     assert_eq!(
         YoutubeChannelRow::record_failure(&pool, "UCother").await.unwrap(),
@@ -191,7 +191,7 @@ async fn failures_accumulate_and_a_success_clears_them(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_confirmed_lease_is_recorded_and_can_be_cleared(pool: PgPool) {
     YoutubeChannelRow::set_lease(&pool, "UCorphan", 432_000).await.unwrap();
     sqlx::query!("INSERT INTO guilds (id) VALUES (5)").execute(&pool).await.unwrap();
@@ -213,7 +213,7 @@ async fn a_confirmed_lease_is_recorded_and_can_be_cleared(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn a_connected_channel_keeps_its_videos(pool: PgPool) {
     YoutubeConnection::delete(&pool, 1).await.unwrap();
 
@@ -233,7 +233,7 @@ async fn a_connected_channel_keeps_its_videos(pool: PgPool) {
 
 /// The channel record survives so a reconnect keeps its hub secret, but it is
 /// unseeded: the next poll absorbs the back catalogue rather than announcing it.
-#[sqlx::test(migrations = "../../migrations", fixtures("youtube"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("youtube"))]
 async fn the_last_disconnect_forgets_videos_but_keeps_the_channel(pool: PgPool) {
     YoutubeConnection::delete(&pool, 1).await.unwrap();
     YoutubeConnection::delete(&pool, 2).await.unwrap();

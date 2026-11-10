@@ -19,7 +19,7 @@ macro_rules! ids {
     }};
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn walks_the_whole_component_in_every_direction(pool: PgPool) {
     let graph = RawGraph::fetch(&pool, GUILD, UserId::new(10), TreeQuota::FREE)
         .await
@@ -31,7 +31,7 @@ async fn walks_the_whole_component_in_every_direction(pool: PgPool) {
     assert!(!graph.truncated);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn a_disjoint_family_in_the_same_guild_is_excluded(pool: PgPool) {
     let graph = RawGraph::fetch(&pool, GUILD, UserId::new(10), TreeQuota::FREE)
         .await
@@ -45,7 +45,7 @@ async fn a_disjoint_family_in_the_same_guild_is_excluded(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn the_component_is_scoped_to_one_guild(pool: PgPool) {
     let here = RawGraph::fetch(&pool, GUILD, UserId::new(10), TreeQuota::FREE)
         .await
@@ -62,7 +62,7 @@ async fn the_component_is_scoped_to_one_guild(pool: PgPool) {
 /// The schema only forbids self-loops, so `A parent of B, B parent of A` is
 /// storable. `UNION` dedupes the recursive term on id, which is what stops
 /// this from spinning forever.
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn a_parent_cycle_terminates(pool: PgPool) {
     let graph = RawGraph::fetch(&pool, GUILD, UserId::new(30), TreeQuota::FREE)
         .await
@@ -71,7 +71,7 @@ async fn a_parent_cycle_terminates(pool: PgPool) {
     assert_eq!(ids!(graph), vec![30, 31]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn edges_are_returned_only_for_the_component(pool: PgPool) {
     let graph = RawGraph::fetch(&pool, GUILD, UserId::new(10), TreeQuota::FREE)
         .await
@@ -83,7 +83,7 @@ async fn edges_are_returned_only_for_the_component(pool: PgPool) {
 
 /// The fetch limit is a blast-radius guard. When it binds, the caller has to
 /// know the component was cut short rather than genuinely small.
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn hitting_the_fetch_limit_is_reported(pool: PgPool) {
     let tight = TreeQuota { fetch_limit: 3, ..TreeQuota::FREE };
 
@@ -95,7 +95,7 @@ async fn hitting_the_fetch_limit_is_reported(pool: PgPool) {
     assert!(graph.truncated, "a truncated component must say so");
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("family_graph"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("family_graph"))]
 async fn a_user_with_no_family_yields_an_empty_graph(pool: PgPool) {
     let graph = RawGraph::fetch(&pool, GUILD, UserId::new(9_999), TreeQuota::FREE)
         .await

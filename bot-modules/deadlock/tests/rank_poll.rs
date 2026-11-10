@@ -55,7 +55,7 @@ macro_rules! badge {
     };
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn the_first_poll_seeds_the_badge_and_a_higher_one_ranks_up(pool: PgPool) {
     let mock = spawn_mock(Reply::ok("[]")).await.unwrap();
     mock.serve("/v1/players/rank", Reply::ok(BADGE_53));
@@ -90,7 +90,7 @@ async fn the_first_poll_seeds_the_badge_and_a_higher_one_ranks_up(pool: PgPool) 
     assert_eq!(snapshot_rows!(&pool), 2);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_streak_milestone_is_announced_once(pool: PgPool) {
     let mock = spawn_mock(Reply::ok("[]")).await.unwrap();
     let api = api(&pool, &mock.base).unwrap();
@@ -109,7 +109,7 @@ async fn a_streak_milestone_is_announced_once(pool: PgPool) {
     assert!(again.is_empty());
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn players_outside_every_squad_are_not_requested(pool: PgPool) {
     let mock = spawn_mock(Reply::ok("[]")).await.unwrap();
     mock.serve("/v1/players/rank", Reply::ok(BADGE_53));

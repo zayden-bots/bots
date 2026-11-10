@@ -66,7 +66,7 @@ fn request_count(mock: &Mock) -> usize {
     mock.requests.lock().map_or(0, |recorded| recorded.len())
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn the_first_poll_summarises_new_matches_and_the_second_finds_none(
     pool: PgPool,
 ) {
@@ -95,7 +95,7 @@ async fn the_first_poll_summarises_new_matches_and_the_second_finds_none(
     assert_eq!(players::all(&pool).await.unwrap()[0].streak, 2);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn matches_from_before_the_link_are_not_backfilled(pool: PgPool) {
     let mock = mock!();
     let api = api(&pool, &mock.base).unwrap();
@@ -110,7 +110,7 @@ async fn matches_from_before_the_link_are_not_backfilled(pool: PgPool) {
     assert_eq!(players::all(&pool).await.unwrap()[0].streak, 0);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn without_linked_players_nothing_is_requested(pool: PgPool) {
     let mock = mock!();
     let api = api(&pool, &mock.base).unwrap();
@@ -123,7 +123,7 @@ async fn without_linked_players_nothing_is_requested(pool: PgPool) {
     assert_eq!(request_count(&mock), 0);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn relinking_to_another_steam_account_replaces_the_player(pool: PgPool) {
     link!(&pool, 1, STEAM_ID);
     players::sync(&pool).await.unwrap();
@@ -147,7 +147,7 @@ async fn relinking_to_another_steam_account_replaces_the_player(pool: PgPool) {
     assert_eq!(after[0].discord_id, 1);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn unlinking_removes_the_player_and_its_seen_matches(pool: PgPool) {
     let mock = mock!();
     let api = api(&pool, &mock.base).unwrap();

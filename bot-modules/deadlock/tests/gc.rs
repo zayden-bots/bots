@@ -2,7 +2,7 @@ use deadlock::gc::{GcOutcome, run};
 use jiff::Timestamp;
 use sqlx::PgPool;
 
-#[sqlx::test(migrations = "../../migrations", fixtures("gc"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("gc"))]
 async fn expired_rows_are_pruned_and_recent_or_pinned_ones_survive(pool: PgPool) {
     let now: Timestamp = "2026-10-17T00:00:00Z".parse().unwrap();
 

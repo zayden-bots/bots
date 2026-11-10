@@ -361,7 +361,10 @@ fn dump_sample_pngs() {
             ))
             .expect("render should succeed");
 
-        let path = format!("../../target/tree-sample-{people}-{tier}.png");
+        let path = format!(
+            "{}/tree-sample-{people}-{tier}.png",
+            env!("CARGO_TARGET_TMPDIR")
+        );
         std::fs::write(&path, png).expect("sample should write");
         println!(
             "wrote {path} ({}x{} @ {:.2}, {} of {} people)",

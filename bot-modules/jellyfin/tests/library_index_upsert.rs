@@ -42,7 +42,7 @@ fn row(
     }
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn reindexes_title_when_item_id_changes(pool: PgPool) -> sqlx::Result<()> {
     row("old-id", "Movie", "Project Hail Mary", Some(687_163)).upsert(&pool).await?;
 
@@ -56,7 +56,7 @@ async fn reindexes_title_when_item_id_changes(pool: PgPool) -> sqlx::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn keeps_untagged_items_apart(pool: PgPool) -> sqlx::Result<()> {
     row("a", "Movie", "Home Video A", None).upsert(&pool).await?;
     row("b", "Movie", "Home Video B", None).upsert(&pool).await?;
@@ -66,7 +66,7 @@ async fn keeps_untagged_items_apart(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn keeps_shared_tmdb_id_across_item_types(pool: PgPool) -> sqlx::Result<()> {
     row("film", "Movie", "Shogun", Some(1_234)).upsert(&pool).await?;
     row("show", "Series", "Shogun", Some(1_234)).upsert(&pool).await?;

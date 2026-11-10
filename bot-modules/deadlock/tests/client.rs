@@ -13,7 +13,7 @@ fn count(requests: &Requests) -> usize {
     requests.lock().map_or(0, |recorded| recorded.len())
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_repeated_call_is_served_from_memory_then_from_postgres(pool: PgPool) {
     let mock = spawn_mock(Reply::ok(RANKS)).await.unwrap();
     let api_one = api(&pool, &mock.base).unwrap();
@@ -33,7 +33,7 @@ async fn a_repeated_call_is_served_from_memory_then_from_postgres(pool: PgPool) 
     assert_eq!(count(&mock.requests), 1);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn an_expired_row_is_served_stale_when_the_api_is_busy(pool: PgPool) {
     let mock = spawn_mock(Reply::ok(RANKS)).await.unwrap();
     api(&pool, &mock.base).unwrap().ranks(Priority::Interactive).await.unwrap();
@@ -59,7 +59,7 @@ async fn an_expired_row_is_served_stale_when_the_api_is_busy(pool: PgPool) {
     assert_eq!(count(&mock.requests), 2);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_busy_api_without_a_cached_row_is_an_error(pool: PgPool) {
     let mock = spawn_mock(Reply {
         status: 503,

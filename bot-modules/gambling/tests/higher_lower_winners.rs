@@ -11,7 +11,7 @@ use gambling::HigherLowerManager;
 use serenity::all::UserId;
 use sqlx::PgPool;
 
-#[sqlx::test(migrations = "../../migrations", fixtures("higher_lower_scores"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("higher_lower_scores"))]
 async fn ranks_players_by_weekly_score(pool: PgPool) -> sqlx::Result<()> {
     let mut conn = pool.acquire().await?;
 
@@ -23,7 +23,7 @@ async fn ranks_players_by_weekly_score(pool: PgPool) -> sqlx::Result<()> {
 }
 
 /// A week nobody played must pay out nothing at all.
-#[sqlx::test(migrations = "../../migrations", fixtures("higher_lower_scores"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("higher_lower_scores"))]
 async fn skips_everyone_when_no_one_scored(pool: PgPool) -> sqlx::Result<()> {
     let mut conn = pool.acquire().await?;
 

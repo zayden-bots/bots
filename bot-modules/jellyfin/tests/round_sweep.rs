@@ -65,7 +65,7 @@ async fn survives(pool: &PgPool, id: i64) -> sqlx::Result<bool> {
     RoundRow::get(pool, id).await.map(|round| round.is_some())
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_round_that_expired_over_a_day_ago_is_swept(pool: PgPool) {
     seed(&pool).await.expect("seeding failed");
     let stale = round_expiring(&pool, Span::new().hours(-25))
@@ -80,7 +80,7 @@ async fn a_round_that_expired_over_a_day_ago_is_swept(pool: PgPool) {
     assert!(!kept, "the stale round outlived the sweep");
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_solved_round_is_swept_without_touching_its_score(pool: PgPool) {
     seed(&pool).await.expect("seeding failed");
     let stale = round_expiring(&pool, Span::new().hours(-25))
@@ -113,7 +113,7 @@ async fn a_solved_round_is_swept_without_touching_its_score(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_live_round_survives(pool: PgPool) {
     seed(&pool).await.expect("seeding failed");
     let live = round_expiring(&pool, Span::new().minutes(5))
@@ -127,7 +127,7 @@ async fn a_live_round_survives(pool: PgPool) {
     assert!(kept, "the live round was swept");
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_round_inside_the_grace_window_survives(pool: PgPool) {
     seed(&pool).await.expect("seeding failed");
     let recent = round_expiring(&pool, Span::new().hours(-2))

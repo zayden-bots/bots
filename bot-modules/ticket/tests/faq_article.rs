@@ -39,7 +39,7 @@ const fn article<'a>(
     }
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn an_article_round_trips(pool: PgPool) -> sqlx::Result<()> {
     let tags = vec![String::from("radarr"), String::from("proxy")];
 
@@ -58,7 +58,7 @@ async fn an_article_round_trips(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn an_article_is_invisible_to_another_guild(pool: PgPool) -> sqlx::Result<()> {
     let stored =
         FaqArticle::create(&pool, GUILD, article("Radarr 502", "body", &[])).await?;
@@ -70,7 +70,7 @@ async fn an_article_is_invisible_to_another_guild(pool: PgPool) -> sqlx::Result<
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn search_finds_an_article_by_its_body(pool: PgPool) -> sqlx::Result<()> {
     FaqArticle::create(
         &pool,
@@ -90,7 +90,7 @@ async fn search_finds_an_article_by_its_body(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn search_takes_arbitrary_user_input(pool: PgPool) -> sqlx::Result<()> {
     // `to_tsquery` would error on this; `websearch_to_tsquery` must not.
     let hits =
@@ -101,7 +101,7 @@ async fn search_takes_arbitrary_user_input(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn search_is_guild_scoped(pool: PgPool) -> sqlx::Result<()> {
     FaqArticle::create(
         &pool,
@@ -117,7 +117,7 @@ async fn search_is_guild_scoped(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn a_second_insert_for_the_same_thread_is_refused(
     pool: PgPool,
 ) -> sqlx::Result<()> {
@@ -147,7 +147,7 @@ async fn a_second_insert_for_the_same_thread_is_refused(
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn each_position_on_a_thread_is_its_own_article(
     pool: PgPool,
 ) -> sqlx::Result<()> {
@@ -179,7 +179,7 @@ async fn each_position_on_a_thread_is_its_own_article(
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn a_generated_article_records_its_thread(pool: PgPool) -> sqlx::Result<()> {
     let stored = FaqArticle::insert_generated(
         &pool,
@@ -197,7 +197,7 @@ async fn a_generated_article_records_its_thread(pool: PgPool) -> sqlx::Result<()
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn a_restatement_outranks_a_title_that_merely_overlaps(
     pool: PgPool,
 ) -> sqlx::Result<()> {
@@ -242,7 +242,7 @@ async fn a_restatement_outranks_a_title_that_merely_overlaps(
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn an_update_replaces_the_body(pool: PgPool) -> sqlx::Result<()> {
     let stored =
         FaqArticle::create(&pool, GUILD, article("Radarr 502", "old", &[])).await?;
@@ -272,7 +272,7 @@ async fn an_update_replaces_the_body(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn similar_finds_an_article_sharing_only_some_terms(
     pool: PgPool,
 ) -> sqlx::Result<()> {
@@ -305,7 +305,7 @@ async fn similar_finds_an_article_sharing_only_some_terms(
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn similar_skips_the_excluded_article_and_other_guilds(
     pool: PgPool,
 ) -> sqlx::Result<()> {
@@ -325,7 +325,7 @@ async fn similar_skips_the_excluded_article_and_other_guilds(
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn similar_takes_input_with_no_search_terms(pool: PgPool) -> sqlx::Result<()> {
     FaqArticle::create(&pool, GUILD, article("Radarr 502", "gateway", &[])).await?;
 
@@ -336,7 +336,7 @@ async fn similar_takes_input_with_no_search_terms(pool: PgPool) -> sqlx::Result<
     Ok(())
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("faq_articles"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("faq_articles"))]
 async fn a_merge_rewrites_and_marks_the_article_generated(
     pool: PgPool,
 ) -> sqlx::Result<()> {

@@ -35,4 +35,5 @@ tracing = { workspace = true }
 url = { workspace = true }
 
 [dev-dependencies]
+schema = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }

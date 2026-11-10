@@ -82,7 +82,7 @@ macro_rules! save {
     }};
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_created_loadout_reads_back_unchanged(pool: PgPool) {
     let id = save!(&pool, None, raw("Round Trip")).unwrap();
 
@@ -91,7 +91,7 @@ async fn a_created_loadout_reads_back_unchanged(pool: PgPool) {
     assert_eq!(RawLoadout::from(record), raw("Round Trip"));
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn an_edit_replaces_every_child_row(pool: PgPool) {
     let id = save!(&pool, None, raw("Edit Me")).unwrap();
     let mut edited = raw("Edit Me");
@@ -105,7 +105,7 @@ async fn an_edit_replaces_every_child_row(pool: PgPool) {
     assert_eq!(RawLoadout::from(record), edited);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn catalog_rows_are_reused_by_name(pool: PgPool) {
     let before = loadout_catalog::perks(&pool).await.unwrap().len();
 
@@ -118,7 +118,7 @@ async fn catalog_rows_are_reused_by_name(pool: PgPool) {
     assert_eq!(weapons.iter().filter(|w| w.name == "Test Weapon").count(), 1);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_duplicate_class_element_name_is_a_readable_error(pool: PgPool) {
     save!(&pool, None, raw("Twin")).unwrap();
 
@@ -128,7 +128,7 @@ async fn a_duplicate_class_element_name_is_a_readable_error(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn updating_a_missing_loadout_is_not_found(pool: PgPool) {
     assert!(matches!(
         save!(&pool, Some(999_999), raw("Ghost")),
@@ -136,7 +136,7 @@ async fn updating_a_missing_loadout_is_not_found(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn delete_removes_the_loadout_and_its_children(pool: PgPool) {
     let id = save!(&pool, None, raw("Doomed")).unwrap();
 
@@ -145,7 +145,7 @@ async fn delete_removes_the_loadout_and_its_children(pool: PgPool) {
     assert!(!loadout_writes::delete(&pool, id).await.unwrap());
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn the_seeded_loadouts_still_load(pool: PgPool) {
     assert_eq!(loadouts::all(&pool).await.unwrap().len(), 11);
 }
@@ -168,7 +168,7 @@ async fn catalog_affinity(pool: &PgPool, weapon: &str) -> Option<Affinity> {
         .map(|w| w.affinity)
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn loadouts_sharing_a_weapon_keep_their_own_affinity(pool: PgPool) {
     let arc =
         save!(&pool, None, with_weapon_affinity("Arc Spam", Affinity::Arc)).unwrap();
@@ -181,7 +181,7 @@ async fn loadouts_sharing_a_weapon_keep_their_own_affinity(pool: PgPool) {
     assert_eq!(void.weapons[0].affinity, Affinity::Void);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_new_weapon_takes_its_first_affinity_and_keeps_it(pool: PgPool) {
     save!(&pool, None, with_weapon_affinity("First", Affinity::Arc)).unwrap();
     assert_eq!(catalog_affinity(&pool, "Dead Messenger").await, Some(Affinity::Arc));
@@ -190,7 +190,7 @@ async fn a_new_weapon_takes_its_first_affinity_and_keeps_it(pool: PgPool) {
     assert_eq!(catalog_affinity(&pool, "Dead Messenger").await, Some(Affinity::Arc));
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn seeded_weapons_keep_their_catalog_affinity(pool: PgPool) {
     let catalog = loadout_catalog::weapons(&pool).await.unwrap();
     for loadout in loadouts::all(&pool).await.unwrap() {
@@ -201,7 +201,7 @@ async fn seeded_weapons_keep_their_catalog_affinity(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn usage_counts_keys_per_field_class_and_element(pool: PgPool) {
     let usage = loadout_catalog::usage(&pool).await.unwrap();
     assert!(usage.iter().any(|u| u.field == "super"
@@ -220,7 +220,7 @@ async fn usage_counts_keys_per_field_class_and_element(pool: PgPool) {
     assert!(usage.iter().all(|u| !u.key.is_empty()));
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn usage_rows_are_unique_per_field_key_class_and_element(pool: PgPool) {
     let usage = loadout_catalog::usage(&pool).await.unwrap();
     let mut seen = std::collections::HashSet::new();
@@ -229,7 +229,7 @@ async fn usage_rows_are_unique_per_field_key_class_and_element(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn super_names_follow_the_latest_loadout(pool: PgPool) {
     let names = loadout_catalog::super_names(&pool).await.unwrap();
     assert!(names.contains(&("thundercrash".to_owned(), "Thundercrash".to_owned())));
@@ -244,7 +244,7 @@ async fn super_names_follow_the_latest_loadout(pool: PgPool) {
     assert_eq!(crash, [&("thundercrash".to_owned(), "Thunder Crash".to_owned())]);
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn known_perks_name_catalog_weapons(pool: PgPool) {
     let known = loadout_catalog::weapon_known_perks(&pool).await.unwrap();
     let weapons = loadout_catalog::weapons(&pool).await.unwrap();
@@ -252,7 +252,7 @@ async fn known_perks_name_catalog_weapons(pool: PgPool) {
     assert!(known.iter().all(|(w, _)| weapons.iter().any(|c| &c.name == w)));
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn armour_pieces_are_distinct_per_slot_and_name(pool: PgPool) {
     let pieces = loadout_catalog::armour_pieces(&pool).await.unwrap();
     assert_ne!(pieces.len(), 0);
@@ -263,7 +263,7 @@ async fn armour_pieces_are_distinct_per_slot_and_name(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn a_save_raises_one_loadouts_changed_notification(pool: PgPool) {
     let mut listener = PgListener::connect_with(&pool).await.unwrap();
     listener.listen("loadouts_changed").await.unwrap();
@@ -279,7 +279,7 @@ async fn a_save_raises_one_loadouts_changed_notification(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../migrations")]
+#[sqlx::test(migrator = "schema::MIGRATOR")]
 async fn every_seeded_loadout_is_an_editable_draft(pool: PgPool) {
     for record in loadouts::all(&pool).await.unwrap() {
         let name = record.name.clone();

@@ -10,7 +10,7 @@ macro_rules! at {
     };
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("briefing_targets"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("briefing_targets"))]
 async fn only_opted_in_players_who_have_not_played_since_are_targeted(pool: PgPool) {
     let published = at!("2026-10-10T12:00:00Z");
 
@@ -26,14 +26,14 @@ async fn only_opted_in_players_who_have_not_played_since_are_targeted(pool: PgPo
     }]);
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("briefing_targets"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("briefing_targets"))]
 async fn a_briefing_is_claimed_once_per_player_and_patch(pool: PgPool) {
     assert!(claim(&pool, "g1", 10).await.unwrap());
     assert!(!claim(&pool, "g1", 10).await.unwrap());
     assert!(claim(&pool, "g1", 99).await.unwrap());
 }
 
-#[sqlx::test(migrations = "../../migrations", fixtures("briefing_targets"))]
+#[sqlx::test(migrator = "schema::MIGRATOR", fixtures("briefing_targets"))]
 async fn only_unbriefed_patches_with_a_diff_inside_the_window_await_briefing(
     pool: PgPool,
 ) {
