@@ -36,6 +36,7 @@ use zayden_core::ModuleCtx;
 use zayden_core::error::HandlerError;
 
 use crate::guild_retention::GuildRetentionCron;
+use crate::persona;
 
 struct ZaydenParentToken;
 
@@ -75,7 +76,7 @@ pub(crate) async fn assemble(
     list.try_add(MusicModule::from_config(cx, Arc::clone(songbird)).await);
     let jellyfin = list.take(jellyfin::runtime_from_config(cx)).flatten();
     list.try_add(TicketModule::from_config(cx));
-    list.try_add(AiModule::from_config(cx));
+    list.try_add(AiModule::from_config(cx, persona::PERSONA, persona::WORLD));
     list.add(HostingModule::from_config(cx))
         .add(JellyfinModule::new(jellyfin.as_ref().map(Arc::clone)))
         .add(WatchModule::new(jellyfin))
