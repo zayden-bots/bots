@@ -1,8 +1,0 @@
-{
-  "worktree": {
-    "bgIsolation": "none"
-  },
-  "enabledPlugins": {
-    "superpowers@superpowers-marketplace": true
-  }
-}
