@@ -116,6 +116,16 @@ jobs:
             dockerfile: docker/Dockerfile.bot
             image: worker
             needs_ytdlp: false
+          - name: maria
+            bin: maria
+            dockerfile: docker/Dockerfile.bot
+            image: maria
+            needs_ytdlp: false
+          - name: llama
+            bin: llama
+            dockerfile: docker/Dockerfile.bot
+            image: llama
+            needs_ytdlp: true
 
     steps:
       - name: Checkout

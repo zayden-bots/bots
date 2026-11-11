@@ -10,7 +10,9 @@ own, so it has no `.sqlx/` cache.
 
 | Path                    | What it is                                                  |
 | ----------------------- | ----------------------------------------------------------- |
-| `bots/zayden/`          | the bot binary — wires modules into a Serenity client       |
+| `bots/zayden/`          | the Zayden bot: a lib (`module_list`) and a bin             |
+| `bots/llama/`           | LlamaBot: Zayden's module list plus llamad2                 |
+| `bots/maria/`           | Maria: AI chat only for now                                 |
 | `bots/worker/`          | the worker binary — scheduled jobs, no Discord gateway      |
 | `docker/Dockerfile.bot` | release image for any bot binary in `bots/*`                |
 | `radio.toml`            | radio station list the bot reads from the working directory |
@@ -39,6 +41,24 @@ The bot reads `config.toml` and `radio.toml` from the working directory, and
 cp .env.example .env              # then fill in the values
 cargo run -p zayden
 ```
+
+## The bots
+
+Each bot wires a module list into `bot-runtime`.
+
+- **`zayden`** is a lib and a bin. The lib exports `module_list`, Zayden's
+  module list before `finish()`, so another bin can extend it. The bin finishes
+  the list and runs it in the Zayden slot. llamad2 is no longer in the default
+  Zayden build.
+- **`llama`** takes `zayden::module_list` and adds llamad2. It boots in the
+  Zayden slot, so it runs as a custom bot (its application id is not the
+  slot's default).
+- **`maria`** boots in the Maria slot and links only the `ai` module: AI chat
+  and nothing else for now. Its persona is in `bots/maria/src/persona.rs`. It
+  has no voice client.
+- **`worker`** is described below.
+
+`llama` and `maria` run with `cargo run -p llama` and `cargo run -p maria`.
 
 ## The worker
 
@@ -190,9 +210,9 @@ commit a `Cargo.lock` written while the link is on: run `dev-link.sh off` and
 clears the nightly-only flags in `.cargo/config.toml`); `rustfmt` runs on
 nightly. `SQLX_OFFLINE=true` is set for every job.
 
-The `images` job builds a release image per matrix entry (`zayden` and
-`worker`) from `docker/Dockerfile.bot` once `rustfmt`, `clippy` and `cargo-deny`
-pass, and pushes it to GHCR as `ghcr.io/<owner>/zayden` and
-`ghcr.io/<owner>/worker` for every event except pull requests. Entries with
-`needs_ytdlp: true` (`zayden`) get the latest yt-dlp release as
-`YTDLP_VERSION`; `worker` sets it to `false`.
+The `images` job builds a release image per matrix entry (`zayden`, `worker`,
+`maria` and `llama`) from `docker/Dockerfile.bot` once `rustfmt`, `clippy` and
+`cargo-deny` pass, and pushes it to GHCR as `ghcr.io/<owner>/<image>` for every
+event except pull requests. Entries with `needs_ytdlp: true` (`zayden`,
+`llama`) get the latest yt-dlp release as `YTDLP_VERSION`; `worker` and `maria`
+set it to `false`.

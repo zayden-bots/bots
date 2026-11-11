@@ -3,7 +3,7 @@ use std::sync::Arc;
 use accounts::AccountsModule;
 use ai::AiModule;
 use async_trait::async_trait;
-use bot_runtime::{Assembly, BotError, ModuleList};
+use bot_runtime::ModuleList;
 use deadlock::DeadlockModule;
 use destiny2::{Destiny2Module, ParentToken};
 use family::FamilyModule;
@@ -15,7 +15,6 @@ use hosting::HostingModule;
 use jellyfin::JellyfinModule;
 use levels::LevelsModule;
 use lfg::LfgModule;
-use llamad2::Llamad2Module;
 use marathon::MarathonModule;
 use misc::MiscModule;
 use moderation::ModerationModule;
@@ -23,7 +22,6 @@ use music::MusicModule;
 use palworld::PalworldModule;
 use patreon::PatreonModule;
 use reaction_roles::ReactionRolesModule;
-use serenity::all::GuildId;
 use songbird::Songbird;
 use sqlx::PgPool;
 use suggestions::SuggestionsModule;
@@ -52,10 +50,10 @@ impl ParentToken for ZaydenParentToken {
     }
 }
 
-pub(crate) async fn assemble(
+pub async fn module_list(
     cx: &ModuleCtx<'_>,
     songbird: &Arc<Songbird>,
-) -> Result<Assembly, BotError> {
+) -> ModuleList {
     let parent_token: Arc<dyn ParentToken> =
         Arc::new(ZaydenParentToken { app: Arc::clone(cx.app), me: cx.me });
     let mut list = ModuleList::default();
@@ -75,8 +73,7 @@ pub(crate) async fn assemble(
     list.try_add(DeadlockModule::from_config(cx));
     list.add(MarathonModule::from_config(cx)).add(PalworldModule::from_config(cx));
     list.try_add(Destiny2Module::from_config(cx, parent_token));
-    list.add(Llamad2Module::new(GuildId::new(cx.config.llamad2_guild)))
-        .add(TempVoiceModule::new());
+    list.add(TempVoiceModule::new());
     list.try_add(MusicModule::from_config(cx, Arc::clone(songbird)).await);
     let jellyfin = list.take(jellyfin::runtime_from_config(&cx.worker())).flatten();
     list.try_add(TicketModule::from_config(cx));
@@ -86,5 +83,5 @@ pub(crate) async fn assemble(
         .add(WatchModule::new(jellyfin))
         .add(PatreonModule)
         .add(YoutubeModule);
-    list.finish()
+    list
 }

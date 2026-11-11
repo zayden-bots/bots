@@ -1,0 +1,31 @@
+[package]
+name = "llama"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "llama"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+bot-runtime = { workspace = true }
+llamad2 = { workspace = true }
+zayden = { workspace = true }
+zayden-app = { workspace = true }
+
+serenity = { workspace = true }
+songbird = { workspace = true, features = [
+  "driver",
+  "gateway",
+  "rustls",
+  "serenity",
+  "tungstenite",
+] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
