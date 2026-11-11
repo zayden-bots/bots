@@ -32,17 +32,23 @@ use ticket::TicketModule;
 use verify::VerifyModule;
 use watch::WatchModule;
 use youtube::YoutubeModule;
-use zayden_core::ModuleCtx;
+use zayden_app::state::AppState;
 use zayden_core::error::HandlerError;
+use zayden_core::{Identity, ModuleCtx};
 
 use crate::persona;
 
-struct ZaydenParentToken;
+struct ZaydenParentToken {
+    app: Arc<AppState>,
+    me: Identity,
+}
 
 #[async_trait]
 impl ParentToken for ZaydenParentToken {
-    async fn get(&self, db: &PgPool) -> Result<String, HandlerError> {
-        bot_runtime::parent_token(db).await.map_err(HandlerError::Database)
+    async fn get(&self, _db: &PgPool) -> Result<String, HandlerError> {
+        bot_runtime::parent_token(&self.app, self.me)
+            .await
+            .map_err(HandlerError::new)
     }
 }
 
@@ -50,7 +56,8 @@ pub(crate) async fn assemble(
     cx: &ModuleCtx<'_>,
     songbird: &Arc<Songbird>,
 ) -> Result<Assembly, BotError> {
-    let parent_token: Arc<dyn ParentToken> = Arc::new(ZaydenParentToken);
+    let parent_token: Arc<dyn ParentToken> =
+        Arc::new(ZaydenParentToken { app: Arc::clone(cx.app), me: cx.me });
     let mut list = ModuleList::default();
     list.add(GreetingsModule::new())
         .add(GoldStarModule::new())
