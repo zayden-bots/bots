@@ -111,6 +111,11 @@ jobs:
             dockerfile: docker/Dockerfile.bot
             image: zayden
             needs_ytdlp: true
+          - name: worker
+            bin: worker
+            dockerfile: docker/Dockerfile.bot
+            image: worker
+            needs_ytdlp: false
 
     steps:
       - name: Checkout

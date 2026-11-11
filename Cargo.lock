@@ -475,7 +475,6 @@ dependencies = [
  "dotenvy",
  "futures",
  "jiff",
- "jiff-cron",
  "metrics",
  "rustls",
  "schema",
@@ -1050,7 +1049,6 @@ dependencies = [
  "deadlock-api",
  "futures",
  "jiff",
- "jiff-cron",
  "jiff-sqlx",
  "moka",
  "reqwest 0.13.5",
@@ -1166,7 +1164,6 @@ dependencies = [
  "futures",
  "google-sheets-api",
  "itertools",
- "jiff-cron",
  "secrecy",
  "serenity",
  "sqlx",
@@ -2119,7 +2116,6 @@ version = "1.0.0"
 dependencies = [
  "async-trait",
  "jiff",
- "jiff-cron",
  "jiff-sqlx",
  "rand 0.10.3",
  "reqwest 0.13.5",
@@ -2581,7 +2577,6 @@ dependencies = [
  "futures",
  "image",
  "jiff",
- "jiff-cron",
  "jiff-sqlx",
  "moka",
  "quick-xml",
@@ -7002,7 +6997,6 @@ dependencies = [
  "futures",
  "jellyfin",
  "jiff",
- "jiff-cron",
  "jiff-sqlx",
  "reqwest 0.13.5",
  "secrecy",
@@ -7416,6 +7410,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
+name = "worker"
+version = "1.0.0"
+dependencies = [
+ "bot-runtime",
+ "deadlock",
+ "destiny2",
+ "gambling",
+ "hosting",
+ "jellyfin",
+ "marathon",
+ "patreon",
+ "ticket",
+ "tokio",
+ "tracing",
+ "watch",
+ "youtube",
+ "zayden-app",
+ "zayden-core",
+]
+
+[[package]]
 name = "writeable"
 version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7514,7 +7529,6 @@ dependencies = [
  "honeypot",
  "hosting",
  "jellyfin",
- "jiff-cron",
  "levels",
  "lfg",
  "llamad2",
@@ -7532,7 +7546,6 @@ dependencies = [
  "temp-voice",
  "ticket",
  "tokio",
- "tracing",
  "verify",
  "watch",
  "youtube",
@@ -7572,8 +7585,10 @@ dependencies = [
  "dashmap",
  "jiff",
  "jiff-cron",
+ "metrics",
  "moka",
  "reqwest 0.13.5",
+ "secrecy",
  "serde",
  "serde_json",
  "serenity",

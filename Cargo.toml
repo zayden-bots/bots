@@ -183,7 +183,6 @@ serenity = { git = "https://github.com/serenity-rs/serenity", branch = "next", d
 songbird = { git = "https://github.com/serenity-rs/songbird", branch = "serenity-next", default-features = false }
 
 # -- Dates and times
-jiff-cron = { version = "*", default-features = false }
 
 # -- Database
 sqlx = { version = "*", default-features = false, features = [

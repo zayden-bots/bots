@@ -35,7 +35,6 @@ use youtube::YoutubeModule;
 use zayden_core::ModuleCtx;
 use zayden_core::error::HandlerError;
 
-use crate::guild_retention::GuildRetentionCron;
 use crate::persona;
 
 struct ZaydenParentToken;
@@ -52,8 +51,6 @@ pub(crate) async fn assemble(
     songbird: &Arc<Songbird>,
 ) -> Result<Assembly, BotError> {
     let parent_token: Arc<dyn ParentToken> = Arc::new(ZaydenParentToken);
-    let patreon_app = patreon::app_from_config(cx.config);
-    let youtube = youtube::runtime_from_config(cx.config);
     let mut list = ModuleList::default();
     list.add(GreetingsModule::new())
         .add(GoldStarModule::new())
@@ -74,17 +71,13 @@ pub(crate) async fn assemble(
     list.add(Llamad2Module::new(GuildId::new(cx.config.llamad2_guild)))
         .add(TempVoiceModule::new());
     list.try_add(MusicModule::from_config(cx, Arc::clone(songbird)).await);
-    let jellyfin = list.take(jellyfin::runtime_from_config(cx)).flatten();
+    let jellyfin = list.take(jellyfin::runtime_from_config(&cx.worker())).flatten();
     list.try_add(TicketModule::from_config(cx));
     list.try_add(AiModule::from_config(cx, persona::PERSONA, persona::WORLD));
     list.add(HostingModule::from_config(cx))
         .add(JellyfinModule::new(jellyfin.as_ref().map(Arc::clone)))
         .add(WatchModule::new(jellyfin))
-        .add(PatreonModule::new(cx.app.http.clone(), patreon_app.clone()))
-        .add(YoutubeModule::new(cx.app.http.clone(), youtube.clone()));
-    list.finish(vec![GuildRetentionCron::cron_job(
-        Arc::clone(cx.app),
-        patreon_app,
-        youtube,
-    )])
+        .add(PatreonModule)
+        .add(YoutubeModule);
+    list.finish()
 }

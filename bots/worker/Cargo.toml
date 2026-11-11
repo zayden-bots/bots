@@ -1,0 +1,33 @@
+[package]
+name = "worker"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "worker"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+bot-runtime = { workspace = true }
+deadlock = { workspace = true }
+destiny2 = { workspace = true }
+gambling = { workspace = true }
+hosting = { workspace = true }
+jellyfin = { workspace = true }
+marathon = { workspace = true }
+patreon = { workspace = true }
+ticket = { workspace = true }
+watch = { workspace = true }
+youtube = { workspace = true }
+zayden-app = { workspace = true }
+zayden-core = { workspace = true }
+
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tracing = { workspace = true }

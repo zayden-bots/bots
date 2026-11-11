@@ -5,18 +5,18 @@ use tracing::{error, info};
 use youtube::{YoutubeConnection, YoutubeRuntime};
 use zayden_app::guilds::{GuildPresence, RETENTION_DAYS};
 use zayden_app::state::AppState;
-use zayden_core::CronJob;
+use zayden_core::{WorkerJob, WorkerJobResult};
 
 pub(crate) struct GuildRetentionCron;
 
 impl GuildRetentionCron {
-    pub(crate) fn cron_job(
+    pub(crate) fn worker_job(
         app: Arc<AppState>,
         patreon: Option<Arc<PatreonApp>>,
         youtube: Option<YoutubeRuntime>,
-    ) -> Result<CronJob, jiff_cron::error::Error> {
-        CronJob::new("guild_retention_purge", "0 30 4 * * * *").map(|job| {
-            job.set_action(move |_ctx, _pool| {
+    ) -> WorkerJobResult {
+        WorkerJob::new("guild_retention_purge", "0 30 4 * * * *").map(|job| {
+            job.set_action(move |_cx| {
                 let app = Arc::clone(&app);
                 let patreon = patreon.clone();
                 let youtube = youtube.clone();

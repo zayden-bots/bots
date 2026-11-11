@@ -47,7 +47,6 @@ zayden-core = { workspace = true }
 zayden-app = { workspace = true }
 
 async-trait = { workspace = true }
-jiff-cron = { workspace = true }
 serenity = { workspace = true }
 songbird = { workspace = true, features = [
   "driver",
@@ -58,4 +57,3 @@ songbird = { workspace = true, features = [
 ] }
 sqlx = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
-tracing = { workspace = true }

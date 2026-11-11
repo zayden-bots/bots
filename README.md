@@ -1,7 +1,8 @@
 # Zayden bots
 
-The Zayden Discord bot binary. It wires the feature crates from
-`zayden-bots/modules` into the `bot-runtime` from `zayden-bots/platform`.
+The Zayden Discord bot binary and the background worker binary. They wire the
+feature crates from `zayden-bots/modules` into the `bot-runtime` from
+`zayden-bots/platform`.
 Serenity for Discord, Postgres via `sqlx`. This repo has no SQL queries of its
 own, so it has no `.sqlx/` cache.
 
@@ -10,6 +11,7 @@ own, so it has no `.sqlx/` cache.
 | Path                    | What it is                                                  |
 | ----------------------- | ----------------------------------------------------------- |
 | `bots/zayden/`          | the bot binary — wires modules into a Serenity client       |
+| `bots/worker/`          | the worker binary — scheduled jobs, no Discord gateway      |
 | `docker/Dockerfile.bot` | release image for any bot binary in `bots/*`                |
 | `radio.toml`            | radio station list the bot reads from the working directory |
 | `docs/`                 | `build-and-toolchain.md`: toolchain and build profiles      |
@@ -37,6 +39,30 @@ The bot reads `config.toml` and `radio.toml` from the working directory, and
 cp .env.example .env              # then fill in the values
 cargo run -p zayden
 ```
+
+## The worker
+
+`bots/zayden` keeps the gateway, the commands and the per-bot jobs.
+`bots/worker` boots with `bot_runtime::worker::boot()`: no gateway connection
+and no `DISCORD_TOKEN`. It runs the migrations, then the scheduled jobs that
+used to run only in the Zayden bot: youtube, patreon, marathon, deadlock,
+destiny2, gambling (stamina), ticket (gc), jellyfin, watch and hosting, plus the
+daily guild retention purge.
+
+Broadcasts go through per-channel Discord webhooks owned by each bot. When a
+channel has no healthy webhook, and for DMs, the worker queues a task that the
+bot serving that guild sends with its own token.
+
+It needs `DATABASE_URL`, `config.toml` and the `CUSTOM_BOT_KEYS` /
+`CUSTOM_BOT_ACTIVE_KEY` keyring (it seals and opens webhook tokens, and fails to
+start without it).
+
+```bash
+cargo run -p worker
+```
+
+Both binaries run migrations, so deploy the bot and the worker together; see
+`../infra/README.md`.
 
 `DATABASE_URL` in `.env` points at the live database. Point it at a throwaway
 one for local work:
@@ -92,7 +118,7 @@ and installs the binary as `/usr/local/bin/bot`, which is the image entrypoint.
 
 ```bash
 docker build -f docker/Dockerfile.bot -t zayden .
-docker build -f docker/Dockerfile.bot --build-arg BIN=<name> -t <name> .
+docker build -f docker/Dockerfile.bot --build-arg BIN=worker -t worker .
 ```
 
 The Dockerfile is a cargo-chef build: dependencies are cooked into a cached
@@ -164,7 +190,9 @@ commit a `Cargo.lock` written while the link is on: run `dev-link.sh off` and
 clears the nightly-only flags in `.cargo/config.toml`); `rustfmt` runs on
 nightly. `SQLX_OFFLINE=true` is set for every job.
 
-The `images` job builds the `zayden` release image from
-`docker/Dockerfile.bot` once `rustfmt`, `clippy` and `cargo-deny` pass, and
-pushes it to GHCR as `ghcr.io/<owner>/zayden` for every event except pull
-requests. It passes the latest yt-dlp release as `YTDLP_VERSION`.
+The `images` job builds a release image per matrix entry (`zayden` and
+`worker`) from `docker/Dockerfile.bot` once `rustfmt`, `clippy` and `cargo-deny`
+pass, and pushes it to GHCR as `ghcr.io/<owner>/zayden` and
+`ghcr.io/<owner>/worker` for every event except pull requests. Entries with
+`needs_ytdlp: true` (`zayden`) get the latest yt-dlp release as
+`YTDLP_VERSION`; `worker` sets it to `false`.

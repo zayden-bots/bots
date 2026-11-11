@@ -3,7 +3,6 @@
 use songbird::Songbird;
 use zayden_app::applications::Slot;
 
-mod guild_retention;
 mod modules;
 mod persona;
 
