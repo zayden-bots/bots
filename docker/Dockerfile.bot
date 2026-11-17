@@ -64,7 +64,7 @@ ARG BIN=zayden
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates libssl3 ffmpeg \
+    ca-certificates libssl3 ffmpeg tzdata \
     fonts-noto-core fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 
