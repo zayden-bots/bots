@@ -5,10 +5,10 @@ version = 4
 [[package]]
 name = "accounts"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "reqwest 0.13.5",
  "serenity",
@@ -131,7 +131,7 @@ dependencies = [
 [[package]]
 name = "ai"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-openai",
  "async-trait",
@@ -477,7 +477,7 @@ dependencies = [
  "async-trait",
  "dotenvy",
  "futures",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "metrics",
  "rustls",
  "schema",
@@ -545,9 +545,9 @@ checksum = "8f1fe948ff07f4bd06c30984e69f5b4899c516a3ef74f34df92a2df2ab535495"
 
 [[package]]
 name = "bytes"
-version = "1.12.1"
+version = "1.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
+checksum = "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c"
 
 [[package]]
 name = "bytestring"
@@ -1081,12 +1081,12 @@ dependencies = [
 [[package]]
 name = "deadlock"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "deadlock-api",
  "futures",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "moka",
  "reqwest 0.13.5",
@@ -1105,13 +1105,14 @@ dependencies = [
 [[package]]
 name = "deadlock-api"
 version = "0.1.0"
-source = "git+https://github.com/ViridianLink/deadlock-api.git?branch=main#828430e787816218d19d4cfedf85a2f79b955b6e"
+source = "git+https://github.com/ViridianLink/deadlock-api.git?branch=main#a3ffde3ad6643584d88706c8e50983858d9730f5"
 dependencies = [
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "reqwest 0.13.5",
  "serde",
  "serde_json",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -1197,7 +1198,7 @@ dependencies = [
 [[package]]
 name = "destiny2"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "bungie-api",
@@ -1519,11 +1520,11 @@ dependencies = [
 [[package]]
 name = "family"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "futures",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "moka",
  "reqwest 0.13.5",
  "serenity",
@@ -1769,13 +1770,13 @@ dependencies = [
 [[package]]
 name = "gambling"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "bigdecimal",
  "dashmap",
  "futures",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "jiff-sqlx",
  "levels",
@@ -1891,10 +1892,10 @@ dependencies = [
 [[package]]
 name = "gold-star"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "serenity",
  "sqlx",
@@ -1916,10 +1917,10 @@ dependencies = [
 [[package]]
 name = "greetings"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "moka",
  "rand 0.10.4",
  "reqwest 0.13.5",
@@ -2143,7 +2144,7 @@ dependencies = [
 [[package]]
 name = "honeypot"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "moderation",
@@ -2159,10 +2160,10 @@ dependencies = [
 [[package]]
 name = "hosting"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "rand 0.10.4",
  "reqwest 0.13.5",
@@ -2248,23 +2249,11 @@ dependencies = [
 
 [[package]]
 name = "htmd"
-version = "0.5.6"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efd66117e0b1eac329399e316f30b9530afcb7cfbd0df59a007023b6673a6c37"
+checksum = "7d39c7ad9c654a43bdc1235259b4e78c84406576b231c1ac37cd06e0af878250"
 dependencies = [
- "html5ever 0.38.0",
- "markup5ever_rcdom",
- "phf 0.13.1",
-]
-
-[[package]]
-name = "html5ever"
-version = "0.38.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1054432bae2f14e0061e33d23402fbaa67a921d319d56adc6bcf887ddad1cbc2"
-dependencies = [
- "log",
- "markup5ever 0.38.0",
+ "html5ever",
 ]
 
 [[package]]
@@ -2274,7 +2263,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "456a1a377e608e555d22ddab27ac0114bc7a7b4199078108e34c2aeae6c9b130"
 dependencies = [
  "log",
- "markup5ever 0.40.0",
+ "markup5ever",
  "memchr",
 ]
 
@@ -2619,12 +2608,12 @@ checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
 [[package]]
 name = "jellyfin"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "futures",
  "image",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "moka",
  "quick-xml",
@@ -2661,12 +2650,12 @@ dependencies = [
 
 [[package]]
 name = "jiff"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cc767b5763de45e810109520123bb2829a653f3a7ed9be40b2bc4f81158f595"
+checksum = "ed5d126d72eb017f10b302e73bdeca446bea405ee449af4d9e7866d6b082d83e"
 dependencies = [
- "jiff-core 1.0.0",
- "jiff-static 1.0.0",
+ "jiff-core 1.0.1",
+ "jiff-static 1.0.1",
  "jiff-tzdb-platform 1.0.0",
  "log",
  "portable-atomic",
@@ -2686,9 +2675,9 @@ dependencies = [
 
 [[package]]
 name = "jiff-core"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "894f7ac42105f584100691b3bf6e6b92dd12fcfa225f6c397f95c8a94b47b68f"
+checksum = "b6b46a105a9874634dd96231021526bf24ca04955a5998c59a9c7666e634b7b8"
 dependencies = [
  "log",
 ]
@@ -2710,7 +2699,7 @@ version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4996ad290ff7f7081becdda47e28556fbebb81618c599eac5d09182b5a60e38"
 dependencies = [
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "sqlx",
 ]
 
@@ -2728,11 +2717,11 @@ dependencies = [
 
 [[package]]
 name = "jiff-static"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "955491488dc99b572ea6d67b172dcd98787d00744b1fb44a5689b4e6413695a6"
+checksum = "c0127e9bde3c6130d6169e7d8d68676e4be69c4bf7573c308b6f960a5089c428"
 dependencies = [
- "jiff-core 1.0.0",
+ "jiff-core 1.0.1",
  "proc-macro2",
  "quote",
  "syn 3.0.10",
@@ -2880,10 +2869,10 @@ dependencies = [
 [[package]]
 name = "levels"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "rand 0.10.4",
  "serenity",
@@ -2896,11 +2885,11 @@ dependencies = [
 [[package]]
 name = "lfg"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "futures",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "serde",
  "serde_json",
@@ -3151,10 +3140,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "libsqlite3-sys"
-version = "0.37.0"
+name = "libredox"
+version = "0.1.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f111c8c41e7c61a49cd34e44c7619462967221a6443b0ec299e0ac30cfb9b1"
+checksum = "61ff90caf6077a803a240f62fdbe88645a890bbca49ef8174c3cb0404362171d"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "libsqlite3-sys"
+version = "0.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b06e69070b7e12262b0cd90832f0a7396f142a2b330181255562decf9f0c6215"
 dependencies = [
  "pkg-config",
  "vcpkg",
@@ -3182,7 +3180,7 @@ dependencies = [
 [[package]]
 name = "llamad2"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "dashmap",
@@ -3255,12 +3253,12 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "marathon"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "futures",
  "itertools",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "moka",
  "regex",
@@ -3290,36 +3288,13 @@ dependencies = [
 
 [[package]]
 name = "markup5ever"
-version = "0.38.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8983d30f2915feeaaab2d6babdd6bc7e9ed1a00b66b5e6d74df19aa9c0e91862"
-dependencies = [
- "log",
- "tendril",
- "web_atoms 0.2.6",
-]
-
-[[package]]
-name = "markup5ever"
 version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ab3dc68ac4a0f5719e560136778c1ee716e296030d75dbd4484e37e39e3a842"
 dependencies = [
  "log",
  "tendril",
- "web_atoms 0.3.0",
-]
-
-[[package]]
-name = "markup5ever_rcdom"
-version = "0.38.0+unofficial"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "333171ccdf66e915257740d44e38ea5b1b19ce7b45d33cc35cb6f118fbd981ff"
-dependencies = [
- "html5ever 0.38.0",
- "markup5ever 0.38.0",
- "tendril",
- "xml5ever",
+ "web_atoms",
 ]
 
 [[package]]
@@ -3471,7 +3446,7 @@ dependencies = [
 [[package]]
 name = "misc"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "rand 0.10.4",
@@ -3483,10 +3458,10 @@ dependencies = [
 [[package]]
 name = "moderation"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "serenity",
  "sqlx",
  "zayden-core",
@@ -3531,11 +3506,11 @@ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 [[package]]
 name = "music"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "dashmap",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "rand 0.10.4",
  "reqwest 0.13.5",
  "rspotify",
@@ -3685,6 +3660,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "objc2-core-foundation"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a180dd8642fa45cdb7dd721cd4c11b1cadd4929ce112ebd8b9f5803cc79d536"
+dependencies = [
+ "bitflags 2.13.2",
+]
+
+[[package]]
+name = "objc2-system-configuration"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7216bd11cbda54ccabcab84d523dc93b858ec75ecfb3a7d89513fa22464da396"
+dependencies = [
+ "objc2-core-foundation",
 ]
 
 [[package]]
@@ -3857,13 +3850,13 @@ dependencies = [
 [[package]]
 name = "palworld"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "flate2",
  "gvas",
  "itertools",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "jiff-sqlx",
  "moka",
@@ -3968,13 +3961,13 @@ checksum = "2ee67f1008b1ba2321834326597b8e186293b049a023cdef258527550b9935b4"
 [[package]]
 name = "patreon"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "ego-tree",
  "futures",
  "hmac 0.13.0",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "jiff-sqlx",
  "md-5",
@@ -4044,16 +4037,6 @@ dependencies = [
  "phf_macros 0.14.0",
  "phf_shared 0.14.0",
  "serde",
-]
-
-[[package]]
-name = "phf_codegen"
-version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49aa7f9d80421bca176ca8dbfebe668cc7a2684708594ec9f3c0db0805d5d6e1"
-dependencies = [
- "phf_generator 0.13.1",
- "phf_shared 0.13.1",
 ]
 
 [[package]]
@@ -4646,7 +4629,7 @@ dependencies = [
 [[package]]
 name = "reaction-roles"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "serenity",
@@ -4726,9 +4709,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.13.1"
+version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f020237b6c8eed93db2e2cb53c00c60a8e1bc73da7d073199a1180401450218d"
+checksum = "9807af0e638c12e753aa1b4e601791bf2a8f71274023c8bbeec12fc149950857"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -4738,9 +4721,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.18"
+version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad8553b9b26413251cbf30e620595c7a41b3887f03da04579c0e6b0d6a06b4b2"
+checksum = "41d60ef07df457506a0a1a2073112eb4aae5733dbd2813c3da77d1b0fd441158"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -4755,9 +4738,9 @@ checksum = "cab834c73d247e67f4fae452806d17d3c7501756d98c8808d7c9c7aa7d18f973"
 
 [[package]]
 name = "regex-syntax"
-version = "0.8.11"
+version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
+checksum = "d902046e6a28a1e4c3cab97258a0ce11e994903f01c2d97a9447a0b3df85f4f6"
 
 [[package]]
 name = "reqwest"
@@ -5179,7 +5162,7 @@ checksum = "6844b5f49a5579f12ba4f89d9f7eec6d71889e4aa0bc7181821040ce66f08fff"
 dependencies = [
  "cssparser",
  "ego-tree",
- "html5ever 0.40.1",
+ "html5ever",
  "precomputed-hash",
  "selectors",
 ]
@@ -5597,9 +5580,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.16.5"
+version = "1.16.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "149309498a5f7334b12ddae0cad8aba81ce785fe91755068867e017cf98fee46"
+checksum = "3244542535d5de959d90ec55d1b5ff0fd2bb7b1310223907d5f11932847f7b59"
 dependencies = [
  "serde",
 ]
@@ -5685,9 +5668,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "378620ccc25c62c89d8be1c819e76a88d59bdcc3304733330788948e619bfd71"
+checksum = "edb1dddfbdfe5fb99dba0541a87b2edb8adbd59e45815db22d32d4fbbb8813dd"
 dependencies = [
  "sqlx-core",
  "sqlx-macros",
@@ -5698,9 +5681,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-core"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05b44e85bf579a8eeb4ceaa77a3a523baf2bf0e9bac7e40f405d537b5d2d5ccb"
+checksum = "c08f9787cc5aff062567dea2205f8ae37a617b04342633ab4f74944858ea6072"
 dependencies = [
  "base64 0.22.1",
  "bigdecimal",
@@ -5723,7 +5706,7 @@ dependencies = [
  "rustls",
  "serde",
  "serde_json",
- "sha2 0.10.9",
+ "sha2 0.11.1",
  "smallvec",
  "thiserror 2.0.21",
  "tokio",
@@ -5735,9 +5718,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-macros"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd2b84f2bc39a5705ef27ec785a11c934a41bbd4a24941e257927cddc26b60bf"
+checksum = "bf62c58a1e7fd6031ee684eee21d07572f5aebe71c273a01ae4f04eeeba47c47"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5748,9 +5731,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-macros-core"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb8d96de5fdc85a5c4ec813432b523ec637e80ba98f046555f75f7908ddac7c3"
+checksum = "c1ff75c9d609ac84aa8a3e0d92b5c0c54bf541a7f70db492fb40c9a4bea792c8"
 dependencies = [
  "cfg-if",
  "dotenvy",
@@ -5761,7 +5744,7 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
- "sha2 0.10.9",
+ "sha2 0.11.1",
  "sqlx-core",
  "sqlx-mysql",
  "sqlx-postgres",
@@ -5774,9 +5757,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-mysql"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90b8020fe17c5f2c245bfa2505d7ef59c5604839527c740266ad2214acebea27"
+checksum = "19eeb93b96eb10a3a59dfb436f3daf87d2fc41168ed9e9dc153ec8257dd6a761"
 dependencies = [
  "bigdecimal",
  "bitflags 2.13.2",
@@ -5801,9 +5784,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-postgres"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87a2bdd6e83f6b3ea525ca9fee568030508b58355a43d0b2c1674d5f79dcd65e"
+checksum = "b0e9e02f764a1fe640eeefc8eb33eeddd274204654ec9f2db8ff851a1dee2364"
 dependencies = [
  "atoi",
  "base64 0.22.1",
@@ -5838,9 +5821,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-sqlite"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "488e99c397a62007e4229aec669a179816339afc6d2620ca6fa420dbee2e982c"
+checksum = "88b6b78a34ddcb1db4046d462db8f79cee811019d7297b99fca8fac5de26672e"
 dependencies = [
  "atoi",
  "flume",
@@ -5917,19 +5900,6 @@ dependencies = [
 
 [[package]]
 name = "string_cache"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a18596f8c785a729f2819c0f6a7eae6ebeebdfffbfe4214ae6b087f690e31901"
-dependencies = [
- "new_debug_unreachable",
- "parking_lot 0.12.5",
- "phf_shared 0.13.1",
- "precomputed-hash",
- "serde",
-]
-
-[[package]]
-name = "string_cache"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ffa8a5dbe8b3f0bbe29d4c3225daafaeead63afdc1b65fc4c01a1384166038e6"
@@ -5938,18 +5908,6 @@ dependencies = [
  "parking_lot 0.12.5",
  "phf_shared 0.14.0",
  "precomputed-hash",
-]
-
-[[package]]
-name = "string_cache_codegen"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "585635e46db231059f76c5849798146164652513eb9e8ab2685939dd90f29b69"
-dependencies = [
- "phf_generator 0.13.1",
- "phf_shared 0.13.1",
- "proc-macro2",
- "quote",
 ]
 
 [[package]]
@@ -6032,7 +5990,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 [[package]]
 name = "suggestions"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "futures",
@@ -6251,7 +6209,7 @@ checksum = "7b2093cf4c8eb1e67749a6762251bc9cd836b6fc171623bd0a9d324d37af2417"
 [[package]]
 name = "temp-voice"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "dashmap",
@@ -6356,14 +6314,14 @@ dependencies = [
 [[package]]
 name = "ticket"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "ai",
  "async-trait",
  "dashmap",
  "futures",
  "htmd",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "jiff-sqlx",
  "regex",
@@ -7005,7 +6963,7 @@ checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 [[package]]
 name = "verify"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "serenity",
@@ -7137,13 +7095,13 @@ dependencies = [
 [[package]]
 name = "watch"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "ai",
  "async-trait",
  "futures",
  "jellyfin",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "reqwest 0.13.5",
  "secrecy",
@@ -7179,26 +7137,14 @@ dependencies = [
 
 [[package]]
 name = "web_atoms"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba8b815c1b593dc0baf78dd0f4fc8fdb2de53198fb1163738093e9a311c33fb3"
-dependencies = [
- "phf 0.13.1",
- "phf_codegen 0.13.1",
- "string_cache 0.9.0",
- "string_cache_codegen 0.6.1",
-]
-
-[[package]]
-name = "web_atoms"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7572660c8890448ba236b7376f27e389c6a7e1c70195622faced601f855c0ada"
 dependencies = [
  "phf 0.14.0",
- "phf_codegen 0.14.0",
- "string_cache 0.11.0",
- "string_cache_codegen 0.11.2",
+ "phf_codegen",
+ "string_cache",
+ "string_cache_codegen",
 ]
 
 [[package]]
@@ -7224,6 +7170,12 @@ name = "whoami"
 version = "2.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "626c4bac6755d76ffc12cb01b2eac751db1996b9e0041de9aa02c8c211ddc82c"
+dependencies = [
+ "libc",
+ "libredox",
+ "objc2-system-configuration",
+ "web-sys",
+]
 
 [[package]]
 name = "wide"
@@ -7596,16 +7548,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "xml5ever"
-version = "0.38.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3dc9559429edf0cd3f327cc0afd9d6b36fa8cec6d93107b7fbe64f806b5f2d9"
-dependencies = [
- "log",
- "markup5ever 0.38.0",
-]
-
-[[package]]
 name = "xmlwriter"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7637,12 +7579,12 @@ dependencies = [
 [[package]]
 name = "youtube"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#c5d8c32a5e0bac62748f0d08fe4279e433f51d77"
+source = "git+https://github.com/zayden-bots/modules#b964b6ad298b5b645803291f3a0208ad09549040"
 dependencies = [
  "async-trait",
  "futures",
  "hmac 0.13.0",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "jiff-sqlx",
  "reqwest 0.13.5",
@@ -7706,8 +7648,8 @@ source = "git+https://github.com/zayden-bots/platform#46ef19dd46451cc2b9f12e497b
 dependencies = [
  "async-trait",
  "aws-lc-rs",
- "base64 0.22.1",
- "jiff 1.0.0",
+ "base64 0.23.1",
+ "jiff 1.0.1",
  "jiff-sqlx",
  "metrics",
  "metrics-exporter-prometheus",
@@ -7729,9 +7671,9 @@ version = "1.0.0"
 source = "git+https://github.com/zayden-bots/platform#46ef19dd46451cc2b9f12e497bbe0a08d84d486b"
 dependencies = [
  "async-trait",
- "base64 0.22.1",
+ "base64 0.23.1",
  "dashmap",
- "jiff 1.0.0",
+ "jiff 1.0.1",
  "jiff-cron",
  "metrics",
  "moka",
