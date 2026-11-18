@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "accounts"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "jiff 1.0.1",
@@ -131,7 +131,7 @@ dependencies = [
 [[package]]
 name = "ai"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-openai",
  "async-trait",
@@ -1081,7 +1081,7 @@ dependencies = [
 [[package]]
 name = "deadlock"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "deadlock-api",
@@ -1198,7 +1198,7 @@ dependencies = [
 [[package]]
 name = "destiny2"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "bungie-api",
@@ -1520,7 +1520,7 @@ dependencies = [
 [[package]]
 name = "family"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "futures",
@@ -1770,7 +1770,7 @@ dependencies = [
 [[package]]
 name = "gambling"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "bigdecimal",
@@ -1892,7 +1892,7 @@ dependencies = [
 [[package]]
 name = "gold-star"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "jiff 1.0.1",
@@ -1917,7 +1917,7 @@ dependencies = [
 [[package]]
 name = "greetings"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "jiff 1.0.1",
@@ -2144,7 +2144,7 @@ dependencies = [
 [[package]]
 name = "honeypot"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "moderation",
@@ -2160,7 +2160,7 @@ dependencies = [
 [[package]]
 name = "hosting"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "jiff 1.0.1",
@@ -2253,6 +2253,7 @@ version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d39c7ad9c654a43bdc1235259b4e78c84406576b231c1ac37cd06e0af878250"
 dependencies = [
+ "ego-tree",
  "html5ever",
 ]
 
@@ -2608,7 +2609,7 @@ checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
 [[package]]
 name = "jellyfin"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "futures",
@@ -2869,7 +2870,7 @@ dependencies = [
 [[package]]
 name = "levels"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "jiff 1.0.1",
@@ -2885,7 +2886,7 @@ dependencies = [
 [[package]]
 name = "lfg"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "futures",
@@ -3180,7 +3181,7 @@ dependencies = [
 [[package]]
 name = "llamad2"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "dashmap",
@@ -3253,7 +3254,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "marathon"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "futures",
@@ -3446,7 +3447,7 @@ dependencies = [
 [[package]]
 name = "misc"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "rand 0.10.4",
@@ -3458,7 +3459,7 @@ dependencies = [
 [[package]]
 name = "moderation"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "jiff 1.0.1",
@@ -3506,7 +3507,7 @@ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 [[package]]
 name = "music"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "dashmap",
@@ -3850,7 +3851,7 @@ dependencies = [
 [[package]]
 name = "palworld"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "flate2",
@@ -3961,7 +3962,7 @@ checksum = "2ee67f1008b1ba2321834326597b8e186293b049a023cdef258527550b9935b4"
 [[package]]
 name = "patreon"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "ego-tree",
@@ -4629,7 +4630,7 @@ dependencies = [
 [[package]]
 name = "reaction-roles"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "serenity",
@@ -5137,7 +5138,7 @@ dependencies = [
 [[package]]
 name = "schema"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/schema#86506383f4fb4a50b2ff461c031c7086c58f4c62"
+source = "git+https://github.com/zayden-bots/schema#76c30df9e40037a27b7515f7779d48c01a0f97cc"
 dependencies = [
  "sqlx",
 ]
@@ -5990,7 +5991,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 [[package]]
 name = "suggestions"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "futures",
@@ -6209,7 +6210,7 @@ checksum = "7b2093cf4c8eb1e67749a6762251bc9cd836b6fc171623bd0a9d324d37af2417"
 [[package]]
 name = "temp-voice"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "dashmap",
@@ -6314,7 +6315,7 @@ dependencies = [
 [[package]]
 name = "ticket"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "ai",
  "async-trait",
@@ -6963,7 +6964,7 @@ checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 [[package]]
 name = "verify"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "serenity",
@@ -7095,7 +7096,7 @@ dependencies = [
 [[package]]
 name = "watch"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "ai",
  "async-trait",
@@ -7579,7 +7580,7 @@ dependencies = [
 [[package]]
 name = "youtube"
 version = "1.0.0"
-source = "git+https://github.com/zayden-bots/modules#2070940cfdc2be86a89db9dfd5bba4e0ed6ed813"
+source = "git+https://github.com/zayden-bots/modules#0fdb1138996108e1ef953614142aeec308a41dda"
 dependencies = [
  "async-trait",
  "futures",
